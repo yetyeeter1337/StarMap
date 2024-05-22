@@ -2,6 +2,9 @@ html, body {
   margin: 0;
   padding: 0;
 }
+#p5play-intro {
+  display: none !important;
+}
 canvas {
   display: block;
 }
