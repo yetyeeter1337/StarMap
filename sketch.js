@@ -6,6 +6,8 @@
 // current version: v0.3.0 enviroment and hyper-jumping
 // working on: modules and mining
 
+
+/*
 // load fonts
 var tomorrow_light;
 var tomorrow_medium;
@@ -13,6 +15,7 @@ function preload() {
   tomorrow_light = loadFont("/Tomorrow-Light.ttf");
   tomorrow_medium = loadFont("/Tomorrow-Medium.ttf");
 }
+*/
 
 let themePrimary = [255, 255, 255];
 let themeSecondary = [0, 90, 255];
@@ -1020,9 +1023,10 @@ var dtCount = 0;
 var Psta = "null";
 var TS = 0;
 var cScroll = 0;
-var sComm = "null";
+var sComm = 0;
+var sTab = "buy"
 var Tmult = 1;
-var buysell = 0;
+var buysell = 1;
 var cart = 0;
 
 let timers = [];
