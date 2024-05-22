@@ -6,7 +6,6 @@
 // current version: v0.3.0 enviroment and hyper-jumping
 // working on: modules and mining
 
-
 // load fonts
 var tomorrow_light;
 var tomorrow_medium;
