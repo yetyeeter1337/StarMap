@@ -40,6 +40,32 @@ function stationScreen(){
 
   // create station buttons
   if (!buttonsLoaded) {
+
+    // I know its inefficient to create the same function multiple times, but this only runs once whenever the buttons are reloaded, so its probably fine
+    function updateButtons(){
+
+      for (let b = 0; b < 5; b++) {
+        if (validCommods.length > b) {
+          var Text =
+            validCommods[TS + b][0];
+          Text =
+            Text +
+            "\n price: " +
+            prices[TS + b] +
+            "\n stock: " +
+            validCommods[TS + b][2] + 
+            "\n in cargo: " + getCargo(validCommods[TS + b][0]);
+          setButtonText("Commod Button " + (b + 1), Text);
+          setButtonColors( "Commod Button " + (b + 1),
+            TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
+            color(10, 10, 15),
+            TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
+            color(10, 10, 15)
+          )
+        }
+      }
+
+    }
   
     print(validCommods)
     clearButtons();
@@ -126,9 +152,9 @@ function stationScreen(){
           90 + yOffset + b * 75,
           170,
           65,
-          (sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100),
+          TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
           color(10, 10, 15),
-          (sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100),
+          TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
           color(10, 10, 15),
           1,
           function () {
@@ -156,6 +182,7 @@ function stationScreen(){
               themeSecondary,
               color(10, 10, 15)
             );
+            updateButtons()
           },
           LEFT,
           CENTER,
@@ -181,26 +208,7 @@ function stationScreen(){
         function () {
           if (TS + 5 < validCommods.length) {
             TS++;
-            for (let b = 0; b < 5; b++) {
-              if (validCommods.length > b) {
-                var Text =
-                  " item: " + validCommods[TS + b][0];
-                if (validCommods[TS + b][4] == 1) {
-                  Text = Text + "\n buying";
-                } else if (validCommods[TS + b][4] == 2) {
-                  Text = Text + "\n selling";
-                } else if (validCommods[TS + b][4] == 3) {
-                  Text = Text + "\n buying and selling";
-                }
-                Text =
-                  Text +
-                  "\n price: " +
-                  prices[TS + b] +
-                  "\n stock: " +
-                  validCommods[TS + b][2];
-                setButtonText("Commod Button " + (b + 1), Text);
-              }
-            }
+            updateButtons()
           }
         },
         CENTER,
@@ -225,25 +233,7 @@ function stationScreen(){
         function () {
           if (TS > 0) {
             TS--;
-            for (let b = 0; b < 5; b++) {
-              var Text = " item: " + validCommods[TS + b][0];
-              if (validCommods[TS + b][4] == 1) {
-                Text = Text + "\n buying";
-              } else if (validCommods[TS + b][4] == 2) {
-                Text = Text + "\n selling";
-              } else if (validCommods[TS + b][4] == 3) {
-                Text = Text + "\n buying and selling";
-              }
-              Text =
-                Text +
-                "\n price: " +
-                prices[TS + b] +
-                "\n stock: " +
-                validCommods[TS + b][2];
-              if (validCommods.length > b) {
-                setButtonText("Commod Button " + (b + 1), Text);
-              }
-            }
+            updateButtons()
           }
         },
         CENTER,
@@ -269,6 +259,7 @@ function stationScreen(){
       function () {
         cart = 0;
         TS = 0
+        sComm = 0
         buttonsLoaded = false
         buysell = 1;
         sTab = "buy"
@@ -297,6 +288,7 @@ function stationScreen(){
       function () {
         cart = 0;
         TS = 0
+        sComm = 0
         buysell = 2;
         sTab = "sell"
         buttonsLoaded = false
@@ -524,11 +516,13 @@ function stationScreen(){
           }
           cart = 0;
           credits = round(credits, 2);
+          updateButtons()
         }
       }
     );
     setButtonEnabled("Confirm Button", true);
 
+    updateButtons()
     buttonsLoaded = true;
   }
 
