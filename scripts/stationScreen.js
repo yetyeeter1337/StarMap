@@ -128,6 +128,92 @@ function stationScreen(){
     );
     setButtonEnabled("Repair Button", true);
 
+    newButton(
+      "Buy Button",
+      "buy",
+      18,
+      35 + xOffset,
+      45 + yOffset,
+      100,
+      30,
+      sTab == "buy"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      sTab == "buy"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      1,
+      function () {
+        cart = 0;
+        TS = 0
+        sComm = 0
+        buttonsLoaded = false
+        buysell = 1;
+        sTab = "buy"
+        clearButtons();
+        
+      },
+      CENTER,
+      CENTER,
+      0
+    );
+    setButtonEnabled("Buy Button", true);
+
+    newButton(
+      "Sell Button",
+      "sell",
+      18,
+      140 + xOffset,
+      45 + yOffset,
+      100,
+      30,
+      sTab == "sell"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      sTab == "sell"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      1,
+      function () {
+        cart = 0;
+        TS = 0
+        sComm = 0
+        buysell = 2;
+        sTab = "sell"
+        buttonsLoaded = false
+        clearButtons()
+      },
+      CENTER,
+      CENTER,
+      0
+    );
+    setButtonEnabled("Sell Button", true);
+
+    newButton(
+      "Modules Button",
+      "modules",
+      18,
+      245 + xOffset,
+      45 + yOffset,
+      100,
+      30,
+      sTab == "modules"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      sTab == "modules"?themeTertiary:themeSecondary,
+      color(10, 10, 15),
+      1,
+      function () {
+        cart = 0;
+        TS = 0
+        sComm = 0
+        buysell = 1;
+        sTab = "modules"
+        buttonsLoaded = false
+        clearButtons()
+      },
+      CENTER,
+      CENTER,
+      0
+    );
+    setButtonEnabled("Modules Button", true);
+
+    if(sTab == "buy" || sTab == "sell"){
     for (let b = 0; b < 5; b++)
       if (validCommods.length > b) {
         var Text = " item: " + validCommods[TS + b][0];
@@ -242,63 +328,6 @@ function stationScreen(){
       );
       setButtonEnabled("Up Button", true);
     }
-
-    newButton(
-      "Buy Button",
-      "buy",
-      18,
-      35 + xOffset,
-      45 + yOffset,
-      100,
-      30,
-      sTab == "buy"?themeTertiary:themeSecondary,
-      color(10, 10, 15),
-      sTab == "buy"?themeTertiary:themeSecondary,
-      color(10, 10, 15),
-      1,
-      function () {
-        cart = 0;
-        TS = 0
-        sComm = 0
-        buttonsLoaded = false
-        buysell = 1;
-        sTab = "buy"
-        clearButtons();
-        
-      },
-      CENTER,
-      CENTER,
-      0
-    );
-    setButtonEnabled("Buy Button", true);
-
-    newButton(
-      "Sell Button",
-      "sell",
-      18,
-      140 + xOffset,
-      45 + yOffset,
-      100,
-      30,
-      sTab == "sell"?themeTertiary:themeSecondary,
-      color(10, 10, 15),
-      sTab == "sell"?themeTertiary:themeSecondary,
-      color(10, 10, 15),
-      1,
-      function () {
-        cart = 0;
-        TS = 0
-        sComm = 0
-        buysell = 2;
-        sTab = "sell"
-        buttonsLoaded = false
-        clearButtons()
-      },
-      CENTER,
-      CENTER,
-      0
-    );
-    setButtonEnabled("Sell Button", true);
 
     newButton(
       "1x Button",
@@ -523,87 +552,91 @@ function stationScreen(){
     setButtonEnabled("Confirm Button", true);
 
     updateButtons()
+  }
     buttonsLoaded = true;
   }
 
   let stationInv = stations[Pstar][Pstation][4];
 
-  if (validCommods.length > 5) {
-    const Start = 150;
-    const End = 400;
+  if(sTab == "buy" || sTab == "sell"){
 
-    fill(10, 10, 15);
-    stroke(themeSecondary);
-    rect(230.5 + xOffset, Start + yOffset, 40, End - Start);
+    if (validCommods.length > 5) {
+      const Start = 150;
+      const End = 400;
 
-    fill(themeSecondary);
-    stroke(themeSecondary);
-    rect(
-      230.5 + xOffset,
-      Start + yOffset +
-        ((End - Start) / validCommods.length) * TS +
-        0.5,
-      40,
-      ((End - Start) / validCommods.length) * 5
-    );
-  }
+      fill(10, 10, 15);
+      stroke(themeSecondary);
+      rect(230.5 + xOffset, Start + yOffset, 40, End - Start);
 
-  stroke(themeSecondary);
-  line(290.5 + xOffset, 80.5 + yOffset, 290.5 + xOffset, 470.5 + yOffset);
-
-  line(290.5 + xOffset, 210.5 + yOffset, 470.5 + xOffset, 210.5 + yOffset);
-
-  noStroke();
-  fill(themeSecondary);
-  if (sComm != "null") {
-    let comdat;
-    for (let i = 0; i < commod.length; i++) {
-      if (commod[i][0] == stationInv[sComm][0]) {
-        comdat = commod[i]
-      }
+      fill(themeSecondary);
+      stroke(themeSecondary);
+      rect(
+        230.5 + xOffset,
+        Start + yOffset +
+          ((End - Start) / validCommods.length) * TS +
+          0.5,
+        40,
+        ((End - Start) / validCommods.length) * 5
+      );
     }
 
-    textSize(13);
-    text(validCommods[sComm][0], 300.5 + xOffset, 90.5 + yOffset);
-    text("Price: " + prices[sComm] + " credits", 300.5 + xOffset, 110.5 + yOffset);
-    text("Weight: " + comdat[4], 300.5 + xOffset, 130.5 + yOffset);
-    text(
-      "Stock: " + validCommods[sComm][2],
-      300.5 + xOffset,
-      150.5 + yOffset,
-      150,
-      30
-    );
-    text(
-      "Demand: " + validCommods[sComm][1] + " units",
-      300.5 + xOffset,
-      170.5 + yOffset
-    );
-    text(
-      "Price Offset: " + validCommods[sComm][3] + " credits",
-      300.5 + xOffset,
-      190.5 + yOffset
-    );
-  }
+    stroke(themeSecondary);
+    line(290.5 + xOffset, 80.5 + yOffset, 290.5 + xOffset, 470.5 + yOffset);
 
-  textSize(14);
-  if (buysell == 0) {
-    text("Cart: N/A", 300 + xOffset, 340 + yOffset);
-    text("Price: N/A", 300 + xOffset, 355 + yOffset);
-  } else {
-    text("Cart: " + cart, 300 + xOffset, 340 + yOffset);
-    if (buysell == 1) {
+    line(290.5 + xOffset, 210.5 + yOffset, 470.5 + xOffset, 210.5 + yOffset);
+
+    noStroke();
+    fill(themeSecondary);
+    if (sComm != "null") {
+      let comdat;
+      for (let i = 0; i < commod.length; i++) {
+        if (commod[i][0] == stationInv[sComm][0]) {
+          comdat = commod[i]
+        }
+      }
+
+      textSize(13);
+      text(validCommods[sComm][0], 300.5 + xOffset, 90.5 + yOffset);
+      text("Price: " + prices[sComm] + " credits", 300.5 + xOffset, 110.5 + yOffset);
+      text("Weight: " + comdat[4], 300.5 + xOffset, 130.5 + yOffset);
       text(
-        "Price: " + round(tradePrice(true, stationInv[sComm], cart), 2),
-        300 + xOffset,
-        355 + yOffset
+        "Stock: " + validCommods[sComm][2],
+        300.5 + xOffset,
+        150.5 + yOffset,
+        150,
+        30
       );
-    } else if (buysell == 2) {
       text(
-        "Price: " + round(tradePrice(false, stationInv[sComm], cart), 2),
-        300 + xOffset,
-        355 + yOffset
+        "Demand: " + validCommods[sComm][1] + " units",
+        300.5 + xOffset,
+        170.5 + yOffset
       );
+      text(
+        "Price Offset: " + validCommods[sComm][3] + " credits",
+        300.5 + xOffset,
+        190.5 + yOffset
+      );
+    }
+
+    textSize(14);
+    if (buysell == 0) {
+      text("Cart: N/A", 300 + xOffset, 340 + yOffset);
+      text("Price: N/A", 300 + xOffset, 355 + yOffset);
+    } else {
+      text("Cart: " + cart, 300 + xOffset, 340 + yOffset);
+      if (buysell == 1) {
+        text(
+          "Price: " + round(tradePrice(true, stationInv[sComm], cart), 2),
+          300 + xOffset,
+          355 + yOffset
+        );
+      } else if (buysell == 2) {
+        text(
+          "Price: " + round(tradePrice(false, stationInv[sComm], cart), 2),
+          300 + xOffset,
+          355 + yOffset
+        );
+      }
     }
   }
 
