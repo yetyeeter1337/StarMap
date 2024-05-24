@@ -1160,6 +1160,8 @@ function loadScene(target){
 // auto resize
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  clearButtons()
+  buttonsLoaded = false
 }
 
 // button and mouse input handling
