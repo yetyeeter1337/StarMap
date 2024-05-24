@@ -648,6 +648,64 @@ function newButton(
   buttons[buttons.length - 1][14] = alx ?? CENTER;
   buttons[buttons.length - 1][15] = aly ?? CENTER;
   buttons[buttons.length - 1][16] = pad ?? 0;
+  buttons[buttons.length - 1][17] = false
+}
+
+// draws the button immediately rather than waiting to draw it last
+function drawButton(buttonName){
+  for(let i = 0; i < buttons.length; i++)
+    if (buttons[i][0] && !buttons[i][17] && buttons[i][1] == buttonName) {
+      let Hover =
+        mouseX > buttons[i][4] &&
+        mouseX < buttons[i][4] + buttons[i][6] &&
+        mouseY > buttons[i][5] &&
+        mouseY < buttons[i][5] + buttons[i][7];
+      strokeWeight(buttons[i][12]);
+      textAlign(buttons[i][14], buttons[i][15]);
+      if (!Hover) {
+        stroke(buttons[i][8]);
+        fill(buttons[i][9]);
+        rect(
+          buttons[i][4] + 0.5,
+          buttons[i][5] + 0.5,
+          buttons[i][6],
+          buttons[i][7]
+        );
+        noStroke();
+        fill(buttons[i][8]);
+        textSize(buttons[i][3]);
+        text(
+          buttons[i][2],
+          buttons[i][4] + 0.5 + buttons[i][16],
+          buttons[i][5] + 0.5 + buttons[i][16],
+          buttons[i][6] - buttons[i][16] * 2,
+          buttons[i][7] - buttons[i][16] * 2
+        );
+      } else if (Hover) {
+        stroke(buttons[i][10]);
+        fill(buttons[i][10]);
+        rect(
+          buttons[i][4] + 0.5,
+          buttons[i][5] + 0.5,
+          buttons[i][6],
+          buttons[i][7]
+        );
+        noStroke();
+        fill(buttons[i][11]);
+        textSize(buttons[i][3]);
+        text(
+          buttons[i][2],
+          buttons[i][4] + 0.5 + buttons[i][16],
+          buttons[i][5] + 0.5 + buttons[i][16],
+          buttons[i][6] - buttons[i][16] * 2,
+          buttons[i][7] - buttons[i][16] * 2
+        );
+        cursor(HAND);
+      }
+      buttons[i][17] = true
+    }
+  
+
 }
 
 function removeButton(name) {
@@ -1701,85 +1759,10 @@ function draw() {
   }
   
   if (screen == "SHIP"){
-    let SW = 700
-    let SH = 500
-    
-    let xOffset = round((windowWidth/2)-(SW/2)) + 0.5
-    let yOffset = round((windowHeight/2)-(SH/2)) + 0.5
-    
-    stroke(themeSecondary)
-    strokeWeight(1.5)
-    stroke(themePrimary);
-    fill(10,10,15)
-    rect(xOffset,yOffset,SW,SH)
-    
-    if(!buttonsLoaded){
-      clearButtons();
-      // newButton(name,displayText,textsize,X,Y,W,H,Col1,Col2,ColP1,ColP2,bWidth,func,alx,aly)
-      
-      
-      
-      buttonsLoaded = true;
-    }
-    
-    textSize(30)
-    noStroke()
-    fill(themePrimary)
-    text("ship management", xOffset + 20, yOffset + 20)
-    
-    textSize(20)
-    text("cargo", xOffset + 20, yOffset + 60)
-    text("ship", xOffset + 350, yOffset + 60)
-    
-    // blocking out UI
-    
-    noFill()
-    stroke(themePrimary)
-    strokeWeight(1)
-    
-    let cargoButtons = 8
-    let buttonDistance = 30
-    for(let i = 0; i < cargoButtons; i++){
-      rect(xOffset + 20, yOffset + 90 + (i*buttonDistance),
-          250, 25)
-      line(xOffset + 45, yOffset + 90 + (i*buttonDistance),
-          xOffset + 45, yOffset + 115 + (i*buttonDistance))
-      line(xOffset + 45, yOffset + 110 + (i*buttonDistance),
-          xOffset + 270, yOffset + 110 + (i*buttonDistance))
-    }
-    
-    rect(xOffset + 275, yOffset + 90, 25, 25)
-    rect(xOffset + 275, yOffset + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
-    rect(xOffset + 275, yOffset + 90 + (buttonDistance * (cargoButtons - 1)), 25, 25)
-    
-    textAlign(CENTER,CENTER)
-    textSize(20)
-    noStroke()
-    fill(themePrimary)
-    text("🡅", xOffset + 275, yOffset + 90, 25, 25)
-    text("🡇", xOffset + 275, yOffset + 90 + (buttonDistance * (cargoButtons - 1)), 25, 25)
-    
-    strokeWeight(2)
-    stroke(255,0,0)
-    noFill()
-    rect(xOffset + 20, yOffset + 95 + (cargoButtons * buttonDistance), 135, 40)
-    stroke(themeSecondary)
-    rect(xOffset + 165, yOffset + 95 + (cargoButtons * buttonDistance), 135, 40)
-    
-    noStroke()
-    fill(255,0,0)
-    textAlign(CENTER, CENTER)
-    textSize(30)
-    text("eject",xOffset + 20, yOffset + 95 + (cargoButtons * buttonDistance), 135, 40)
-    fill(themeSecondary)
-    text("use",xOffset + 165, yOffset + 95 + (cargoButtons * buttonDistance), 135, 40)
-    
-    textAlign(LEFT,TOP)
-    fill(themePrimary)
-    textSize(15)
-    text("item name:\nweight per item:\ntotal amount on ship:", xOffset + 20, yOffset + 150 + (cargoButtons * buttonDistance))
-    
-    
+
+    // code is in scripts/shipScreen.js
+    shipScreen()
+
   }
   
   if(screen == "PAUSE"){
@@ -1824,7 +1807,7 @@ function draw() {
   
   // draw buttons
   for (let i = 0; i < buttons.length; i++) {
-    if (buttons[i][0]) {
+    if (buttons[i][0] && !buttons[i][17]) {
       let Hover =
         mouseX > buttons[i][4] &&
         mouseX < buttons[i][4] + buttons[i][6] &&
@@ -1873,6 +1856,7 @@ function draw() {
         cursor(HAND);
       }
     }
+    buttons[i][17] = false
   }
   
 }
