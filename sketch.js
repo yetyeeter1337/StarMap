@@ -654,7 +654,7 @@ function newButton(
 // draws the button immediately rather than waiting to draw it last
 function drawButton(buttonName){
   for(let i = 0; i < buttons.length; i++)
-    if (buttons[i][0] && !buttons[i][17] && buttons[i][1] == buttonName) {
+    if (buttons[i][0] && buttons[i][17] == false && buttons[i][1] == buttonName) {
       let Hover =
         mouseX > buttons[i][4] &&
         mouseX < buttons[i][4] + buttons[i][6] &&
@@ -1027,7 +1027,7 @@ function displayCargo(Cargo) {
     cargoDisplay[i] = [];
     if (Cargo[i][0] == "EMPTY") {
       cargoDisplay[i][0] = 0;
-      cargoDisplay[i][1] = color(0, 0, 255);
+      cargoDisplay[i][1] = color(100);
     } else {
       let com = getCommodity(Cargo[i][0]);
       cargoDisplay[i][0] = (Cargo[i][1] * com[4]) / maxStack;
@@ -1622,6 +1622,7 @@ function draw() {
   if(kb.pressed("c") && (screen == "NONE" || screen == "SYSTEM" || screen == "STARS") && !paused){
     screen = "SHIP"
     buttonsLoaded = false;
+    clearButtons()
   } else if (kb.pressed("c") && screen == "SHIP"){
     screen = "NONE"
     clearButtons()
