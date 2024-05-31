@@ -35,7 +35,7 @@ let credits = 500; // currency
 let cargoSlots = 8;
 let maxStack = 50; // how much of a single item type will typically stack
 let cargo = []; // resources and items
-let maxModules = 6;
+let maxModules = 2;
 let modules = []; // ship upgrades
 let weight = 100; // weight of ship, with modules and cargo
 let maxWeight = 200; // the maximum weight that the ship can jump with, less weight uses less fuel
@@ -68,6 +68,13 @@ let industries = [
   "Organics",
   "Manufacturing",
 ];
+let moduleTypes = [
+
+  ["Cargo Racks S"],
+  ["Refinery S",[],[],null,0], // input stack (2 slots), output stack (2 slots), currently processing, progress (out of 100)
+  ["Algae Production Unit S",0,0,0] // water (max = 50), algae (max = 100), progress (out of 100)
+
+]
 let commod = [
   // list of possible commodities, their typical prices, and where they are sold and bought, and it's weight per unit  commod[commodity][0 = name, 1 = typical price, 2 = [places it can be sold], 3 = [places it can be bought], 4 = weight, 5 = color]
   ["Hyper Fuel", 0.5, ["anywhere"], ["anywhere"], 0.5, [215, 50, 235]],

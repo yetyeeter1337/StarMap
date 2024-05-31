@@ -45,6 +45,39 @@ function shipScreen(){
       }
       )
       setButtonEnabled("Eject Button", true)
+
+      newButton("Use Button","use",30,
+      xOffset + 165, yOffset + 95 + (cargoButtons * buttonDistance), 135, 40,
+      color(0,0,255),color(10,10,15),color(0,0,255),color(10,10,15),
+      2, function(){
+        
+        let cargoType = cargo[escargo][0]
+
+        switch(cargoType){
+
+          case "Hyper Fuel":
+            let usage = min(maxFuel - fuel, cargo[escargo][1])
+            fuel += usage
+            cargo = removeCargo(cargo[escargo][0], usage)[0]
+            break
+          
+          case "Hull Plating":
+              if(playerShip.integrity < playerShip.maxIntegrity){
+                playerShip.integrity += 10
+                if(playerShip.integrity > playerShip.maxIntegrity) playerShip.integrity = playerShip.maxIntegrity
+                cargo = removeCargo(cargo[escargo][0], 1)[0]
+              }
+            break
+          
+
+        }
+
+        buttonsLoaded = false
+        clearButtons()
+
+      }
+      )
+      setButtonEnabled("Use Button", true)
       
       buttonsLoaded = true;
     }
