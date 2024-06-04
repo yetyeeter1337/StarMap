@@ -68,22 +68,133 @@ let industries = [
   "Organics",
   "Manufacturing",
 ];
+// I was very close to just using arrays again
+// all modules should have an onInstall, onRemove, update, and screen function
+// a screen function is needed if the module needs an interface (Ex: the refinery needs an interface, cargo racks do not)
+// if the module does not have a screen set screen to false
 let moduleTypes = [
 
-  ["Cargo Racks S"],
-  ["Refinery S",[],[],null,0], // input stack (2 slots), output stack (2 slots), currently processing, progress (out of 100)
-  ["Algae Production Unit S",0,0,0] // water (max = 50), algae (max = 100), progress (out of 100)
+  cargoRackS = {
+    name: "Cargo Rack S",
+    onInstall: function(){
+      cargoSlots += 4
+      for(let i = 0; i < 4; i++){
+        cargo[cargo.length] = ["EMPTY"]
+      }
+    },
+    onRemove: function(){
+      cargoSlots -= 4
+      for(i = 0; i < 4; i++){
+        // attempts to move cargo into lower areas to reduce loss of items
+        let tempStack = cargo[cargoSlots + i]
+        let cargoCount = getCargo(tempStack[0])
+        cargo = removeCargo(tempStack[0],cargoCount)[0]
+        cargo = addCargo(tempStack[0],cargoCount)[0]
+      }
+      cargo.length = cargoSlots
+    },
+    update: function(){
+
+    },
+    screen: false
+  },
+  RefineryS = {
+    name: "Refinery S",
+    inputStack: [["EMPTY"],["EMPTY"]],
+    outputStack: [["EMPTY"],["EMPTY"]],
+    processing: null,
+    progress: 0,
+    onInstall: function() {
+
+    },
+    onRemove: function() {
+
+    },
+    update: function(){
+
+    },
+    screen: function(){
+
+    }
+  },
+  AlgaeProductionUnitS = {
+    name: "Algae Production Unit S",
+    water: 0,
+    algae: 0,
+    progress: 0,
+    working: false,
+    onInstall: function() {
+
+    },
+    onRemove: function() {
+      
+    },
+    update: function(){
+      if(!this.working && this.water > 0) {
+        this.working = true
+        this.water -= 1
+      }
+      if(this.working && progress < 100) progress += (round(deltaTime/1000,3)) * (30/100)
+      if(this.progress > 100) progress = 100
+      if(this.progress >= 100 && this.algae < 100){
+        this.algae += 2
+        this.working = false
+        this.progress = 0
+      }
+    },
+    screen: function(){
+      let SW = 700
+      let SH = 500
+      
+      let xo = round((windowWidth/2)-(SW/2)) + 0.5
+      let yo = round((windowHeight/2)-(SH/2)) + 0.5
+      
+      strokeWeight(1.5)
+      stroke(themePrimary);
+      fill(10,10,15)
+      rect(xo,yo,SW,SH)
+      
+      if(!buttonsLoaded){
+
+
+
+        buttonsLoaded = true
+      }
+
+      textSize(30)
+      fill(0,0,210)
+      noStroke()
+      textAlign(LEFT,TOP)
+      text("Biosis Modular Algae Farm mk 2.2346.1", xo + 20, yo + 20)
+
+    }
+  }
 
 ]
+
+function installShipModule(moduleName){
+  if(modules.length < maxModules){
+    let moduleFound = false
+    for(let i = 1; i < moduleTypes.length; i++){
+      if(moduleTypes[i].name == moduleName){
+        modules[modules.length] = Object.assign({},moduleTypes[i])
+        moduleFound = true
+      }
+    }
+    if(!moduleFound) return
+    modules[modules.length - 1].onInstall()
+  }
+}
+
 let commod = [
   // list of possible commodities, their typical prices, and where they are sold and bought, and it's weight per unit  commod[commodity][0 = name, 1 = typical price, 2 = [places it can be sold], 3 = [places it can be bought], 4 = weight, 5 = color]
   ["Hyper Fuel", 0.5, ["anywhere"], ["anywhere"], 0.5, [215, 50, 235]],
   ["Iron Ore", 2, ["Refining"], ["Mining"], 3, [100, 30, 5]],
   ["Copper Ore", 2, ["Refining"], ["Mining"], 3, [150, 100, 0]],
   ["Uranium Ore", 7, ["Refining"], ["Mining"], 4, [0, 240, 100]],
-  ["Carbon Ore", 3, ["Refining"], ["Mining"], 2, [50, 50, 50]],
-  ["Gold Ore", 7, ["Refining"], ["Mining"], 4, [200, 180, 0]],
-  ["Ice", 3, ["Mining", "Refining"], ["Mining"], 3, [0, 40, 220]],
+  ["Carbon Ore", 2, ["Refining"], ["Mining"], 2, [50, 50, 50]],
+  ["Gold Ore", 4, ["Refining"], ["Mining"], 4, [200, 180, 0]],
+  ["Ice", 1, ["Mining", "Refining"], ["Mining"], 3, [0, 40, 220]],
   [
     "Iron",
     5,
@@ -126,29 +237,30 @@ let commod = [
   ],
   [
     "Gold",
-    15,
+    18,
     ["Mining", "Refining", "Technology", "Manufacturing"],
     ["Refining"],
     7,
     [200, 180, 0],
   ],
-  ["Water", 4, ["anywhere"], ["anywhere"], 3, [0, 40, 220]],
+  ["Water", 3, ["anywhere"], ["anywhere"], 3, [0, 40, 220]],
   ["Hydrogen", 1, ["Refining"], ["Technology","Manufacturing"], 0.5, [235,235,255]],
   ["Oxygen", 1, ["Refining"], ["Technology","Manufacturing"], 0.5, [235,255,255]],
   ["Hull Plating", 10, ["anywhere"], ["Manufacturing"], 8, [140, 140, 145]],
   ["Motors", 12, ["Technology"], ["Manufacturing"], 3, [150, 130, 120]],
-  ["Algae", 2, ["Technology"], ["Organics"], 2, [0, 130, 100]],
-  ["FOODSNACK™", 2, ["anywhere"], ["Organics"], 1, [0, 150, 100]],
-  ["Processors", 15, ["anywhere"], ["Technology"], 2, [230, 230, 230]],
-  ["Solar Panels", 30, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
+  ["Algae", 1, ["Technology"], ["Organics"], 2, [0, 130, 100]],
+  ["FOODSNACK™", 5, ["anywhere"], ["Organics"], 1, [0, 150, 100]],
+  ["Processors", 20, ["anywhere"], ["Technology"], 2, [230, 230, 230]],
+  ["Solar Panels", 25, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
 ];
 
 var smeltables = [
   [2, "Iron Ore", 1, "Iron"],
   [2, "Copper Ore", 1, "Copper"],
   [2, "Carbon Ore", 1, "Carbon"],
-  [2, "Gold Ore", 1, "Gold"],
+  [3, "Gold Ore", 1, "Gold"],
   [2, "Ice", 1, "Water"],
+  [2,"Algae",1,"FOODSNACK™"]
 ];
 function deepCopy(array) {
   return JSON.parse(JSON.stringify(array));
@@ -867,6 +979,8 @@ function setup() {
   for (let i = 0; i < cargoSlots; i++) {
     cargo[i] = ["EMPTY"];
   }
+
+  installShipModule("Algae Production Unit S")
 }
 
 // give the star system index and the station index and the commodity name and return the station's commodity data
@@ -876,12 +990,16 @@ function findCommodity(starSystem, station, commodity) {
     if (stations[starSystem][station][4][i][0] == commodity)
       return stations[starSystem][station][4][i];
   }
+  return false
 }
 
 // cargo functions
 
 // returns a table of [0 = resulting cargo, 1 = success, 2 = items added]
-function addCargo(commodityName, count) {
+function addCargo(commodityName, count, CARGO) {
+  
+  CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+
   let spaceAvailable = false;
   let availableRoom = 0;
   let item;
@@ -894,34 +1012,34 @@ function addCargo(commodityName, count) {
   // error handling
   if (commodityName == "EMPTY") {
     print('DONT TRY TO ADD "EMPTY" YOU IDIOT!');
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
   if (item == null) {
     print("no matching item!");
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
   if (count < 0) {
     print("USE removeCargo TO REMOVE CARGO, NOT addCargo!");
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
 
   // check whether there is room available and how much more of the item it can hold
-  for (let i = 0; i < cargo.length; i++) {
-    if (cargo[i][0] == "EMPTY") {
+  for (let i = 0; i < CARGO.length; i++) {
+    if (CARGO[i][0] == "EMPTY") {
       spaceAvailable = true;
       availableRoom += floor(maxStack / item[4]);
     }
 
-    if (cargo[i][0] == item[0] && cargo[i][1] <= floor(maxStack / item[4])) {
+    if (CARGO[i][0] == item[0] && CARGO[i][1] <= floor(maxStack / item[4])) {
       spaceAvailable = true;
-      availableRoom += floor(maxStack / item[4]) - cargo[i][1];
+      availableRoom += floor(maxStack / item[4]) - CARGO[i][1];
     }
   }
 
   // return the original cargo and failed if there is no room
-  if (!spaceAvailable) return [cargo, false, 0];
+  if (!spaceAvailable) return [CARGO, false, 0];
 
-  let newCargo = JSON.parse(JSON.stringify(cargo));
+  let newCargo = JSON.parse(JSON.stringify(CARGO));
   let cargoToAdd;
   if (availableRoom >= count) {
     cargoToAdd = count;
@@ -960,10 +1078,13 @@ function addCargo(commodityName, count) {
 }
 
 // returns a table of [0 = resulting cargo, 1 = success, 2 = items removed]
-function removeCargo(commodityName, count) {
+function removeCargo(commodityName, count, CARGO) {
+
+  CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+
   let cargoToRemove = count;
   let removedCargo = 0;
-  let newCargo = JSON.parse(JSON.stringify(cargo));
+  let newCargo = JSON.parse(JSON.stringify(CARGO));
 
   let cargoFound = false;
   for (let i = 0; i < newCargo.length; i++) {
@@ -973,14 +1094,14 @@ function removeCargo(commodityName, count) {
   // error handling
   if (commodityName == "EMPTY") {
     print('DONT TRY TO REMOVE "EMPTY" YOU IDIOT!');
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
   if (!cargoFound) {
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
   if (count < 0) {
     print("USE addCargo TO ADD CARGO, NOT removeCargo!");
-    return [cargo, false, 0];
+    return [CARGO, false, 0];
   }
 
   for (let i = newCargo.length - 1; i >= 0; i--) {
@@ -1005,22 +1126,28 @@ function removeCargo(commodityName, count) {
 }
 
 // returns the resulting cargo array
-function clearStack(stackIndex) {
-  let newCargo = cargo;
-  if (stackIndex >= cargo.length) return cargo;
+function clearStack(stackIndex, CARGO) {
+
+  CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+
+  let newCargo = CARGO;
+  if (stackIndex >= CARGO.length) return CARGO;
   newCargo[stackIndex] = ["EMPTY"];
   return newCargo;
 }
 
 // returns how much of the entered item you have, or how many stacks of EMPTY you have
-function getCargo(commodityName) {
+function getCargo(commodityName, CARGO) {
+
+  CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+
   let itemCount = 0;
-  for (let i = 0; i < cargo.length; i++) {
-    if (cargo[i][0] == commodityName) {
+  for (let i = 0; i < CARGO.length; i++) {
+    if (CARGO[i][0] == commodityName) {
       if (commodityName == "EMPTY") {
         itemCount++;
       } else {
-        itemCount += cargo[i][1];
+        itemCount += CARGO[i][1];
       }
     }
   }
@@ -1691,7 +1818,7 @@ function draw() {
             // get the commodities that can be smelted
             let smeltable = [];
             for (let i = 0; i < smeltables.length; i++) {
-              smeltable[smeltable.length] = smeltables[i][1];
+              if(findCommodity(ss, s, smeltables[i][1])) smeltable[smeltable.length] = smeltables[i][1];
             }
 
             // smelt [NUMBER] smeltable commodites and exchange them for their smelted form
@@ -1771,6 +1898,17 @@ function draw() {
     // code is in scripts/shipScreen.js
     shipScreen()
 
+  }
+
+  if (screen.split(" ")[0] == "MODULE"){
+    if(modules[0 + screen.split(" ")[1]]??false){
+      if(modules[0 + screen.split(" ")[1]].screen){
+        modules[0 + screen.split(" ")[1]].screen()
+      } else {
+        screen = "SHIP"
+        shipScreen()
+      }
+    }
   }
   
   if(screen == "PAUSE"){

@@ -1,5 +1,6 @@
 var escargo = 0; // I really thought I was funny
 var Cscroll = 0;
+var Mscroll = 0
 
 function shipScreen(){
 
@@ -16,10 +17,13 @@ function shipScreen(){
     rect(xOffset,yOffset,SW,SH)
 
     let cargoButtons = 8
+    let moduleButtons = 4
     let buttonDistance = 30
+    let moduleDistance = 55
 
     let dispCargo = displayCargo(cargo)
 
+    
     if(!buttonsLoaded){
       clearButtons();
       // newButton(name,displayText,textsize,X,Y,W,H,Col1,Col2,ColP1,ColP2,bWidth,func,alx,aly)
@@ -28,7 +32,7 @@ function shipScreen(){
         newButton("Cargo Button "+i,"",1,
         xOffset + 20, yOffset + 90 + (i*buttonDistance),
             250, 25,
-            dispCargo[i][1],color(10,10,15),dispCargo[i][1],color(10,10,15),2,
+            dispCargo[i + Cscroll][1],color(10,10,15),dispCargo[i + Cscroll][1],color(10,10,15),2,
         function(){
             escargo = Cscroll + i
         }, CENTER, CENTER)
@@ -78,7 +82,55 @@ function shipScreen(){
       }
       )
       setButtonEnabled("Use Button", true)
-      
+
+      newButton("Up Button","🡅",20, xOffset + 275 - 0.5, yOffset + 90 - 0.5, 25, 25,
+        themePrimary,color(10,10,15),themePrimary,color(10,10,15),1,
+        function(){
+
+            if(Cscroll > 0) Cscroll --
+
+            clearButtons()
+            buttonsLoaded = false
+
+        }
+      )
+      setButtonEnabled("Up Button", true)
+
+      newButton("Down Button","🡇",20, xOffset + 275 - 0.5, yOffset + 90 - 0.5 + (buttonDistance * (cargoButtons - 1)), 25, 25,
+        themePrimary,color(10,10,15),themePrimary,color(10,10,15),1,
+        function(){
+
+            if(Cscroll + cargoButtons < cargoSlots) Cscroll ++
+
+            clearButtons()
+            buttonsLoaded = false
+
+        }
+      )
+      setButtonEnabled("Down Button", true)
+
+      for(let i = 0; i < moduleButtons; i++){
+        if(i + Mscroll < maxModules){
+          let modumeName
+          if(modules[i + Mscroll]??false){
+            moduleName = modules[i + Mscroll].name
+          } else {
+            moduleName = "none"
+          }
+          newButton("Module Button "+i,moduleName,20,
+          xOffset + 350, yOffset + 90 + (i*moduleDistance),
+              250, 50,
+              themePrimary,color(10,10,15),themePrimary,color(10,10,15),2,
+          function(){
+              screen = "MODULE " + (Mscroll + i)
+              consoleMessage("opening " + modules[Mscroll + i].name + " screen")
+              clearButtons()
+              buttonsLoaded = false
+          }, LEFT, TOP, 3)
+          setButtonEnabled("Module Button "+i, true)
+        }
+      }
+
       buttonsLoaded = true;
     }
     
@@ -98,7 +150,7 @@ function shipScreen(){
     
     for(let i = 0; i < cargoButtons; i++){
         drawButton("Cargo Button "+i)
-        rect(xOffset + 45, yOffset + 110 + (i*buttonDistance), 225 * dispCargo[i][0],5)
+        rect(xOffset + 45, yOffset + 110 + (i*buttonDistance), 225 * dispCargo[i + Cscroll][0],5)
         noFill()
         stroke(themePrimary)
         strokeWeight(1)
@@ -110,10 +162,10 @@ function shipScreen(){
             fill(themePrimary)
             textAlign(LEFT,CENTER)
             textSize(10)
-            text(cargo[i][0],xOffset + 50, yOffset + 90 + (i*buttonDistance),220, 25)
+            text(cargo[i + Cscroll][0],xOffset + 50, yOffset + 90 + (i*buttonDistance),220, 25)
             textSize(15)
             textAlign(CENTER,CENTER)
-            text(cargo[i][1]??"",xOffset + 20, yOffset + 90 + (i*buttonDistance),25, 30)
+            text(cargo[i + Cscroll][1]??"",xOffset + 20, yOffset + 90 + (i*buttonDistance),25, 30)
     }
 
     noFill()
@@ -123,6 +175,19 @@ function shipScreen(){
     rect(xOffset + 275, yOffset + 90, 25, 25)
     rect(xOffset + 275, yOffset + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
     rect(xOffset + 275, yOffset + 90 + (buttonDistance * (cargoButtons - 1)), 25, 25)
+    fill(themePrimary)
+    if(cargoButtons < cargoSlots){
+
+      let barLength = (buttonDistance * (cargoButtons - 2)) - 5
+      rect(xOffset + 275, yOffset + 120 + ( barLength/cargoSlots * Cscroll ), 25, barLength/cargoSlots * cargoButtons)
+
+    } else {
+      
+      rect(xOffset + 275, yOffset + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
+
+    }
+
+    
     
     textAlign(CENTER,CENTER)
     textSize(20)
