@@ -123,7 +123,6 @@ function shipScreen(){
               themePrimary,color(10,10,15),themePrimary,color(10,10,15),2,
           function(){
               screen = "MODULE " + (Mscroll + i)
-              consoleMessage("opening " + modules[Mscroll + i].name + " screen")
               clearButtons()
               buttonsLoaded = false
           }, LEFT, TOP, 3)

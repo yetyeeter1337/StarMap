@@ -124,20 +124,20 @@ let moduleTypes = [
     progress: 0,
     working: false,
     onInstall: function() {
-
+      newTimer("Algae Timer")
     },
     onRemove: function() {
-      
+      removeTimer("Algae Timer")
     },
     update: function(){
       if(!this.working && this.water > 0) {
         this.working = true
         this.water -= 1
+        resetTimer("Algae Timer")
       }
-      if(this.working && progress < 100) progress += (round(deltaTime/1000,3)) * (30/100)
-      if(this.progress > 100) progress = 100
-      if(this.progress >= 100 && this.algae < 100){
-        this.algae += 2
+      if(this.working)this.progress = min(round(getTimer("Algae Timer")/20,3) * 100, 100)
+      if(this.progress >= 100 && this.algae < 150 && this.working){
+        this.algae += 3
         this.working = false
         this.progress = 0
       }
@@ -155,17 +155,59 @@ let moduleTypes = [
       rect(xo,yo,SW,SH)
       
       if(!buttonsLoaded){
+        
 
+        newButton("Add 1 Water Button", "add 1",20, xo + 20, yo + 130, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+      function(){
+        let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,1)
+        if(availableWater <= 0) return
+        let removal = removeCargo("Water", availableWater)
+        cargo = removal[0]
+        modules[+screen.split(" ")[1]].water += availableWater
+      }, CENTER, CENTER)
+      setButtonEnabled("Add 1 Water Button", true)
 
+      newButton("Add 10 Water Button", "add 10",20, xo + 100, yo + 130, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+      function(){
+        let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,10)
+        if(availableWater <= 0) return
+        let removal = removeCargo("Water", availableWater)
+        cargo = removal[0]
+        modules[+screen.split(" ")[1]].water += availableWater
+      }, CENTER, CENTER)
+      setButtonEnabled("Add 10 Water Button", true)
+
+      newButton("Add Max Water Button", "add max",20, xo + 180, yo + 130, 90, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+      function(){
+        let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,50)
+        if(availableWater <= 0) return
+        let removal = removeCargo("Water", availableWater)
+        cargo = removal[0]
+        modules[+screen.split(" ")[1]].water += availableWater
+      }, CENTER, CENTER)
+      setButtonEnabled("Add Max Water Button", true)
 
         buttonsLoaded = true
       }
 
       textSize(30)
-      fill(0,0,210)
+      fill(0,210,0)
       noStroke()
       textAlign(LEFT,TOP)
       text("Biosis Modular Algae Farm mk 2.2346.1", xo + 20, yo + 20)
+
+      fill(themePrimary)
+      textSize(18)
+      text("water: " + this.water, xo + 20, yo + 70)
+      text("on ship: "+getCargo("Water"), xo + 20, yo + 110)
+      text("algae: " + this.algae+"   progress: " + this.progress, xo + 20, yo + 200)
+
+      strokeWeight(1)
+      stroke(0,0,255)
+      noFill()
+      rect(xo + 20, yo + 92, 200, 5)
+      fill(0,0,255)
+      rect(xo + 20, yo + 92, 200 * (this.water / 50), 5)
 
     }
   }
@@ -248,7 +290,7 @@ let commod = [
   ["Oxygen", 1, ["Refining"], ["Technology","Manufacturing"], 0.5, [235,255,255]],
   ["Hull Plating", 10, ["anywhere"], ["Manufacturing"], 8, [140, 140, 145]],
   ["Motors", 12, ["Technology"], ["Manufacturing"], 3, [150, 130, 120]],
-  ["Algae", 1, ["Technology"], ["Organics"], 2, [0, 130, 100]],
+  ["Algae", 1, ["Technology"], ["Organics"], 1, [0, 130, 100]],
   ["FOODSNACK™", 5, ["anywhere"], ["Organics"], 1, [0, 150, 100]],
   ["Processors", 20, ["anywhere"], ["Technology"], 2, [230, 230, 230]],
   ["Solar Panels", 25, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
@@ -1413,6 +1455,11 @@ function draw() {
     buttonsLoaded = false
   }
   if(paused) screen = "PAUSE"
+
+  // update modules
+  for(let i = 0; i < modules.length; i++){
+    modules[i]?.update()
+  }
   
   // background
   stroke(255)
@@ -1901,9 +1948,12 @@ function draw() {
   }
 
   if (screen.split(" ")[0] == "MODULE"){
-    if(modules[0 + screen.split(" ")[1]]??false){
-      if(modules[0 + screen.split(" ")[1]].screen){
-        modules[0 + screen.split(" ")[1]].screen()
+    if(+screen.split(" ")[1] > modules.length){ 
+      screen = "SHIP"
+      shipScreen()
+    }else{
+      if(modules[+screen.split(" ")[1]]?.screen??false){
+        modules[+screen.split(" ")[1]].screen()
       } else {
         screen = "SHIP"
         shipScreen()
