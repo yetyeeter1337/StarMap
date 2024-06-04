@@ -76,6 +76,7 @@ let moduleTypes = [
 
   cargoRackS = {
     name: "Cargo Rack S",
+    price: 150,
     onInstall: function(){
       cargoSlots += 4
       for(let i = 0; i < 4; i++){
@@ -100,6 +101,7 @@ let moduleTypes = [
   },
   RefineryS = {
     name: "Refinery S",
+    price: 300,
     inputStack: [["EMPTY"],["EMPTY"]],
     outputStack: [["EMPTY"],["EMPTY"]],
     processing: null,
@@ -119,6 +121,7 @@ let moduleTypes = [
   },
   AlgaeProductionUnitS = {
     name: "Algae Production Unit S",
+    price: 250,
     water: 0,
     algae: 0,
     progress: 0,
@@ -157,7 +160,7 @@ let moduleTypes = [
       if(!buttonsLoaded){
         
 
-        newButton("Add 1 Water Button", "add 1",20, xo + 20, yo + 130, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+        newButton("Add 1 Water Button", "add 1",20, xo + 20, yo + 200, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 2,
       function(){
         let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,1)
         if(availableWater <= 0) return
@@ -167,7 +170,7 @@ let moduleTypes = [
       }, CENTER, CENTER)
       setButtonEnabled("Add 1 Water Button", true)
 
-      newButton("Add 10 Water Button", "add 10",20, xo + 100, yo + 130, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+      newButton("Add 10 Water Button", "add 10",20, xo + 100, yo + 200, 70, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 2,
       function(){
         let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,10)
         if(availableWater <= 0) return
@@ -177,7 +180,7 @@ let moduleTypes = [
       }, CENTER, CENTER)
       setButtonEnabled("Add 10 Water Button", true)
 
-      newButton("Add Max Water Button", "add max",20, xo + 180, yo + 130, 90, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 3,
+      newButton("Add Max Water Button", "add max",20, xo + 180, yo + 200, 90, 30, color(0,0,255), color(10,10,15), color(0,0,255), color(10,10,15), 2,
       function(){
         let availableWater = min(getCargo("Water"),50 - modules[+screen.split(" ")[1]].water,50)
         if(availableWater <= 0) return
@@ -186,6 +189,38 @@ let moduleTypes = [
         modules[+screen.split(" ")[1]].water += availableWater
       }, CENTER, CENTER)
       setButtonEnabled("Add Max Water Button", true)
+
+
+
+      newButton("Take 1 Algae Button", "take 1",20, xo + 20, yo + 330, 70, 30, color(0,255,0), color(10,10,15), color(0,255,0), color(10,10,15), 2,
+      function(){
+        let availableAlgae = min(addCargo("Algae",10000)[2],modules[+screen.split(" ")[1]].algae,1)
+        if(availableAlgae <= 0) return
+        let addition = addCargo("Algae", availableAlgae)
+        cargo = addition[0]
+        modules[+screen.split(" ")[1]].algae -= availableAlgae
+      }, CENTER, CENTER)
+      setButtonEnabled("Take 1 Algae Button", true)
+
+      newButton("Take 10 Algae Button", "take 10",20, xo + 100, yo + 330, 80, 30, color(0,255,0), color(10,10,15), color(0,255,0), color(10,10,15), 2,
+      function(){
+        let availableAlgae = min(addCargo("Algae",10000)[2],modules[+screen.split(" ")[1]].algae,10)
+        if(availableAlgae <= 0) return
+        let addition = addCargo("Algae", availableAlgae)
+        cargo = addition[0]
+        modules[+screen.split(" ")[1]].algae -= availableAlgae
+      }, CENTER, CENTER)
+      setButtonEnabled("Take 10 Algae Button", true)
+
+      newButton("Take Max Algae Button", "take max",20, xo + 190, yo + 330, 100, 30, color(0,255,0), color(10,10,15), color(0,255,0), color(10,10,15), 2,
+      function(){
+        let availableAlgae = min(addCargo("Algae",10000)[2],modules[+screen.split(" ")[1]].algae,150)
+        if(availableAlgae <= 0) return
+        let addition = addCargo("Algae", availableAlgae)
+        cargo = addition[0]
+        modules[+screen.split(" ")[1]].algae -= availableAlgae
+      }, CENTER, CENTER)
+      setButtonEnabled("Take Max Algae Button", true)
 
         buttonsLoaded = true
       }
@@ -198,16 +233,55 @@ let moduleTypes = [
 
       fill(themePrimary)
       textSize(18)
-      text("water: " + this.water, xo + 20, yo + 70)
-      text("on ship: "+getCargo("Water"), xo + 20, yo + 110)
-      text("algae: " + this.algae+"   progress: " + this.progress, xo + 20, yo + 200)
+      text("water: " + this.water, xo + 20, yo + 140)
+      text("on ship: "+getCargo("Water"), xo + 20, yo + 180)
+      text("algae: " + this.algae, xo + 20, yo + 270)
+      text("room on ship: " + addCargo("Algae", 10000)[2], xo + 20, yo + 310)
 
       strokeWeight(1)
       stroke(0,0,255)
       noFill()
-      rect(xo + 20, yo + 92, 200, 5)
+      rect(xo + 20, yo + 162, 200, 5)
       fill(0,0,255)
-      rect(xo + 20, yo + 92, 200 * (this.water / 50), 5)
+      rect(xo + 20, yo + 162, 200 * (this.water / 50), 5)
+
+      stroke(0,255,0)
+      noFill()
+      rect(xo + 20, yo + 292, 200, 5)
+      fill(0,255,0)
+      rect(xo + 20, yo + 292, 200 * (this.algae / 150), 5)
+
+
+      // big algae panel thing to fill in space
+
+      fill(0,(this.progress/100 * 255), (230 - (this.progress/100 * 220)) * min(this.water, 1) + 15)
+      strokeWeight(3)
+      stroke(0,(this.progress/100 * 255) - 60, 255 - (this.progress/100 * 255) - 60)
+      rect(xo + 400, yo + 140, 40, 260)
+      rect(xo + 454, yo + 140, 40, 260)
+      rect(xo + 508, yo + 140, 40, 260)
+      rect(xo + 562, yo + 140, 40, 260)
+      rect(xo + 616, yo + 140, 40, 260)
+
+      fill(10,10,15)
+      stroke(120)
+      strokeWeight(2)
+      rect(xo + 380 - 0.5, yo + 100 - 0.5, 300,41)
+      rect(xo + 380 - 0.5, yo + 400 - 0.5, 300,40)
+
+      strokeWeight(1)
+      rect(xo + 385, yo + 105, 60, 30)
+      noFill()
+      rect(xo + 660, yo + 430, 20, 10)
+      rect(xo + 390, yo + 430, 5, 5)
+      rect(xo + 400, yo + 430, 5, 5)
+      rect(xo + 410, yo + 430, 5, 5)
+
+      noStroke()
+      fill(this.working?130:230,0,0)
+      rect(xo + 650 - 0.5, yo + 105 - 0.5, 10, 5)
+      fill(0,this.working?240:130,0)
+      rect(xo + 665 - 0.5, yo + 105 - 0.5, 10, 5)
 
     }
   }
