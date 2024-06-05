@@ -76,7 +76,9 @@ let moduleTypes = [
 
   cargoRackS = {
     name: "Cargo Rack S",
+    soldAt: ["anywhere"],
     price: 150,
+    description: "Increases storage capacity by 4 stacks.",
     onInstall: function(){
       cargoSlots += 4
       for(let i = 0; i < 4; i++){
@@ -102,6 +104,8 @@ let moduleTypes = [
   RefineryS = {
     name: "Refinery S",
     price: 300,
+    soldAt: ["Mining","Refining","Technology","Manufacturing"],
+    description: "Refines raw goods (Ex: ores into metals, algae into food, etc.)",
     inputStack: [["EMPTY"],["EMPTY"]],
     outputStack: [["EMPTY"],["EMPTY"]],
     processing: null,
@@ -122,6 +126,8 @@ let moduleTypes = [
   AlgaeProductionUnitS = {
     name: "Algae Production Unit S",
     price: 250,
+    soldAt: ["Organics","Technology","Manufacturing"],
+    description:"Slowly grows algae using water.",
     water: 0,
     algae: 0,
     progress: 0,
@@ -254,9 +260,9 @@ let moduleTypes = [
 
       // big algae panel thing to fill in space
 
-      fill(0,(this.progress/100 * 255), (230 - (this.progress/100 * 220)) * min(this.water, 1) + 15)
+      fill(0,(this.progress/100 * 200), (255 - (this.progress/100 * 230)) * min(this.water, 1) + 15)
       strokeWeight(3)
-      stroke(0,(this.progress/100 * 255) - 60, 255 - (this.progress/100 * 255) - 60)
+      stroke(0,(this.progress/100 * 200) - 60, 230 - (this.progress/100 * 230) - 60)
       rect(xo + 400, yo + 140, 40, 260)
       rect(xo + 454, yo + 140, 40, 260)
       rect(xo + 508, yo + 140, 40, 260)

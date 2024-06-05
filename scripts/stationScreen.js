@@ -552,6 +552,11 @@ function stationScreen(){
 
     updateButtons()
   }
+  if(sTab == "modules"){
+    
+
+    
+  }
     buttonsLoaded = true;
   }
 
