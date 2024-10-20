@@ -1,0 +1,94 @@
+STAR MAP FABRICATION OPTIMIZATION MODULE
+(planning document)
+(hopefully this should allow us to work better)
+
+CURRENTLY WORKING ON: MODULE SCREEN
+
+NEEDED FEATURES:
+  - module selection buttons
+    - should work similarly to commodity selection buttons
+  - menu navigation buttons
+    - again, we can probably just use the code from the commodity selection screens
+  - module information
+    - dump the text from the module's description onto the screen
+    - get the price
+  - installing modules onto the ship
+    - check if the module can be installed (have enough money, enough space on the ship, module slot is big enough)
+  - uninstalling modules
+    - allow player to select module to remove
+    - pay them a small amount of credits for the salvage
+    - remove the module, and modify the ship however it needs to be modified (should be handled per module already)
+
+
+TODO:
+  - PRIORITY: debug/devtools, most importantly something to speed up making buttons and menus
+  - add nebulas, the game needs to look pretty (also finish making stars)
+  - more places to visit, likely asteroid fields first, but add other POIs too (shipwrecks? trading caravans? SOS beacons?)
+  - OMFG SAVING YOU NEED TO BE ABLE TO SAVE THE DAMN GAME DO NOT FORGET this
+  - lore??
+  - a main menu and settings menu
+  - mining
+  - SFX (also pretty important)
+  - more playable ships
+  - improve ui visuals (they could look WAY cooler, just saying)
+    - make the crazy-ass screens of your dreams
+  - larger and more dynamic map (different resources, danger levels, factions?)
+  - make movement fun (custom movement, less reliance on physics engine other than for collisions)
+    - please I need to be able to drift the spaceship
+    - also very much needed in order for the next thing to be fun
+    - maybe make ship rotation controlled by the mouse
+  - NPC ships and combat (difficult but necessary)
+    - NPC ai
+    - weapons (turrets and spinals)
+  - more crafting
+  - missions and interactable NPCs
+
+
+ELABORATE:
+  - debug/devtools, most importantly something to speed up making buttons and menus
+
+  making menus and buttons is a pain in the ass,
+  getting the correct coordinates and size for each one and manually adjusting the button function sucks.
+  we need to make a tool that allows us to quickly get coordinates for a button using some sort of visual interface
+
+
+  - add nebulae, the game needs to look pretty (also finish making stars)
+
+  nebulae should be generated alongside the regular star map
+  using perlin noise there would be three layers of nebulae
+  three noise maps would be generated, one for R, G, and B seperately
+  each of these would determine the transparency of the nebula colors
+  there would be a high threshold to make sure that they don't generate everywhere
+  the maps would be 2-3x larger than the star map, to improve the illusion that they are local to a few star systems
+  also they would be slightly offset from each other to create a more interesting visual
+
+
+  - more places to visit, likely asteroid fields first, but add other POIs too (shipwrecks? trading caravans? SOS beacons?)
+
+  space is a bit boring right now, there isn't anywhere to go other than stations
+  making it possible to visit asteroid belts would be a good start, as well as pave the way for mining
+  adding random or even temporary POIs such as shipwrecks with salvageable loot or SOS beacons with a random events
+  caravans could carry special items or deals
+
+
+  - OMFG SAVING YOU NEED TO BE ABLE TO SAVE THE DAMN GAME DO NOT FORGET this
+
+  this may or may not be a pain in the ass but it is 100% needed
+  we can it in the browser chache
+  we stuff all of the arrays and variables into one big table and the load it the same way
+  either that or we try to compress it (no lol)
+
+
+  - lore??
+
+  this would help the game feel meaningful and also probably help our motivation while also giving us ideas for gameplay
+  ?: can we put protogens in it
+  sure, as long as you handle it appropriately
+  we will need factions
+  and some sort of plot driver
+  who are we and why should we be doing anything
+
+
+  - a main menu and settings menu
+
+  having a main menu will make our game feel more polished, 

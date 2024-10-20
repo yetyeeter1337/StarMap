@@ -49,6 +49,7 @@ let m = []; // star map positions
 let inf = []; // star names
 let cl = []; // star classes
 let sys = []; // solar systems and planets, sys[solar system][planet][data]
+let sDist = 100 // player distance from system star, mostly for VFX
 let classes = [
   // star types
   "Red M-Class",
@@ -85,7 +86,9 @@ let moduleTypes = [
         cargo[cargo.length] = ["EMPTY"]
       }
     },
-    onRemove: function(){
+    // thanks past me for thinking of just doing this
+    // and also writing all that code
+    onRemove: function(){ 
       cargoSlots -= 4
       for(i = 0; i < 4; i++){
         // attempts to move cargo into lower areas to reduce loss of items
@@ -260,9 +263,9 @@ let moduleTypes = [
 
       // big algae panel thing to fill in space
 
-      fill(0,(this.progress/100 * 200), (255 - (this.progress/100 * 230)) * min(this.water, 1) + 15)
+      fill(0,(this.progress/100 * 150), (255 - (this.progress/100 * 230)) * min(this.water, 1) + 15)
       strokeWeight(3)
-      stroke(0,(this.progress/100 * 200) - 60, 230 - (this.progress/100 * 230) - 60)
+      stroke(0,(this.progress/100 * 150) - 60, 230 - (this.progress/100 * 230) - 60)
       rect(xo + 400, yo + 140, 40, 260)
       rect(xo + 454, yo + 140, 40, 260)
       rect(xo + 508, yo + 140, 40, 260)
@@ -1437,6 +1440,8 @@ function loadScene(target){
   playerShip.speed = 0
   camera.x = playerShip.x
   camera.y = playerShip.y
+
+  sDist = 100
   
   // get the star index
   let star = + target.split("-")[1]
@@ -1448,6 +1453,8 @@ function loadScene(target){
     // extracts the station index from the string using dark magic
     let sta = + target.split("-")[3]
     Pstation = sta
+
+    sDist = stations[Pstar][Pstation][1]
     
     let Scol;
     switch (stations[Pstar][Pstation][0]){
@@ -1567,6 +1574,210 @@ function draw() {
   noStroke()
   fill(10,10,15)
   rect(windowWidth/2 - 3, windowHeight/2 - 3, windowWidth/2 + 3, windowHeight/2 + 3)
+
+  
+  // psuedo random offset from the center
+  let randX = ((Pstar * 132) - Pstar) % 400 - 200 + (windowWidth/2)
+  let randY = ((Pstar * 121) + Pstar) % 400 - 200 + (windowHeight/2)
+
+  let poly1ct
+  let poly2ct
+  let poly1s
+  let poly2s
+  let poly1r
+  let poly2r
+  let gridSize
+
+  switch (cl[Pstar]) {
+    case "Red M-Class":
+      poly1ct = 10
+      poly2ct = 12
+      poly1s = 0.05
+      poly2s = -0.04
+      poly1r = 32 * (100/sDist)
+      poly2r = 30 * (100/sDist)
+      stroke(1)
+      strokeCap(ROUND)
+
+      fill(200,20,0)
+      stroke(200,20,0)
+
+      for(let i = 0; i < poly1ct; i++){
+
+        
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r,
+          randX + cos( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r
+        )
+
+      }
+      
+
+      fill(200,20,0)
+      stroke(200,20,0)
+
+      push()
+      beginClip()
+
+      for(let i = 0; i < poly2ct; i++){
+
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r,
+          randX + cos( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r
+        )
+
+      }
+      endClip()
+
+      gridSize = 8
+
+      for(let x = 0; x < gridSize; x++){
+        for(let y = 0; y < gridSize; y++){
+
+            let colVal = noise(x/gridSize + 0.1, y/gridSize + 0.1, sin(dtCount*20)*3 + 0.2)
+            let col = color(180 + (colVal * 40),20 + (colVal * 80),0)
+
+            stroke(col)
+            fill(col)
+
+            rect(randX - (poly1r) + (x * (poly1r*2/gridSize)), randY - (poly1r) + (y * (poly1r*2/gridSize)), poly1r/gridSize*2, poly1r/gridSize*2)
+
+        }
+      }
+
+      pop()
+
+      break;
+
+    case "Yellow M-Class":
+
+      poly1ct = 10
+      poly2ct = 12
+      poly1s = 0.05
+      poly2s = -0.04
+      poly1r = 26 * (100/sDist)
+      poly2r = 25 * (100/sDist)
+      stroke(1)
+      strokeCap(ROUND)
+
+      fill(200,180,50)
+      stroke(200,180,50)
+
+      for(let i = 0; i < poly1ct; i++){
+
+        
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r,
+          randX + cos( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r
+        )
+
+      }
+      
+
+      fill(200,20,0)
+      stroke(200,20,0)
+
+      push()
+      beginClip()
+
+      for(let i = 0; i < poly2ct; i++){
+
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r,
+          randX + cos( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r
+        )
+
+      }
+      endClip()
+
+      gridSize = 8
+
+      for(let x = 0; x < gridSize; x++){
+        for(let y = 0; y < gridSize; y++){
+
+            let colVal = noise(x/gridSize + 0.1, y/gridSize + 0.1, sin(dtCount*20)*3 + 0.2)
+            let col = color(60 + (colVal * 180),50 + (colVal * 180),0)
+
+            stroke(col)
+            fill(col)
+
+            rect(randX - (poly1r) + (x * (poly1r*2/gridSize)), randY - (poly1r) + (y * (poly1r*2/gridSize)), poly1r/gridSize*2, poly1r/gridSize*2)
+
+        }
+      }
+
+      pop()
+      
+      break;
+
+    case "Blue M-Class":
+
+      poly1ct = 10
+      poly2ct = 12
+      poly1s = 0.05
+      poly2s = -0.04
+      poly1r = 21 * (100/sDist)
+      poly2r = 20 * (100/sDist)
+      stroke(1)
+      strokeCap(ROUND)
+
+      fill(50,140,210)
+      stroke(50,140,210)
+
+      for(let i = 0; i < poly1ct; i++){
+
+        
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( (i*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r,
+          randX + cos( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r, randY + sin( ((i+1)*(360/poly1ct)) + (dtCount*(360*poly1s)) )*poly1r
+        )
+
+      }
+      
+
+
+      push()
+      beginClip()
+
+      for(let i = 0; i < poly2ct; i++){
+
+        triangle(randX, randY,
+          randX + cos( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( (i*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r,
+          randX + cos( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r, randY + sin( ((i+1)*(360/poly2ct)) + (dtCount*(360*poly2s)) )*poly2r
+        )
+
+      }
+      endClip()
+
+      gridSize = 8
+
+      for(let x = 0; x < gridSize; x++){
+        for(let y = 0; y < gridSize; y++){
+
+            let colVal = noise(x/gridSize + 0.1, y/gridSize + 0.1, sin(dtCount*20)*3 + 0.2)
+            let col = color(50 + (colVal * 30),80 + (colVal * 90),180 + (colVal * 50))
+
+            stroke(col)
+            fill(col)
+
+            rect(randX - (poly1r) + (x * (poly1r*2/gridSize)), randY - (poly1r) + (y * (poly1r*2/gridSize)), poly1r/gridSize*2, poly1r/gridSize*2)
+
+        }
+      }
+
+      pop()
+      
+      break;
+
+    case "Red Giant":
+      
+      break;
+    case "Neutron Star":
+
+      break;
+  }
+
+
   
   // smooth-ish camera follow
   camera.x = playerShip.x - (playerShip.vel.x * 2)

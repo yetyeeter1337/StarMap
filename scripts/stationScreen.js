@@ -26,6 +26,7 @@ function stationScreen(){
     }
   }
 
+  // get a list of commodities that can be sold at this station
   let validCommods = []
 
   for(let i = 0; i < stations[Pstar][Pstation][4].length; i++){
@@ -37,6 +38,22 @@ function stationScreen(){
     }
 
   }
+
+  // get a list of modules that can be sold at this station
+  let validModules = []
+
+  for(let i = 0; i < moduleTypes.length; i++){
+    
+    for(let t = 0; t < moduleTypes[i].soldAt.length; t++){
+      
+      if(moduleTypes[i].soldAt[t] == stations[Pstar][Pstation][0] || moduleTypes[i].soldAt[t] == "anywhere"){
+        validModules[validModules.length] = moduleTypes[i]
+      }
+
+    }
+
+  }
+
 
   // create station buttons
   if (!buttonsLoaded) {
@@ -65,6 +82,22 @@ function stationScreen(){
         }
       }
 
+    }
+
+    function updateModuleButtons(){
+      for (let b = 0; b < 5; b++) {
+        if (validModules.length > b) {
+          var Text =
+            validModules[TS + b].name;
+          setButtonText("Module Buy Button " + (b + 1), Text);
+          setButtonColors( "Module Buy Button " + (b + 1),
+            TS + b == sComm? themeTertiary : themeSecondary,
+            color(10, 10, 15),
+            TS + b == sComm? themeTertiary : themeSecondary,
+            color(10, 10, 15)
+          )
+        }
+      }
     }
   
     clearButtons();
@@ -237,7 +270,7 @@ function stationScreen(){
           90 + yOffset + b * 75,
           170,
           65,
-          TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
+          TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)), // this gaurd clause vomit checks whether the button should be blue or gray when not
           color(10, 10, 15),
           TS + b == sComm? themeTertiary : ((sTab == "sell" && getCargo(validCommods[b + TS][0]) > 0) || sTab == "buy" ?themeSecondary:color(100)),
           color(10, 10, 15),
@@ -553,10 +586,90 @@ function stationScreen(){
     updateButtons()
   }
   if(sTab == "modules"){
-    
 
     
+    // module selector buttons
+    for (let b = 0; b < 5; b++)
+      if (validModules.length > b) {
+        var Text = validModules[b].name
+        newButton(
+          "Module Buy Button " + (b + 1),
+          Text,
+          14,
+          50 + xOffset,
+          90 + yOffset + b * 75,
+          170,
+          65,
+          TS + b == sComm? themeTertiary : themeSecondary, 
+          color(10, 10, 15),
+          TS + b == sComm? themeTertiary : themeSecondary,
+          color(10, 10, 15),
+          1,
+          function () {
+            sComm = b + TS;
+            updateModuleButtons()
+          },
+          LEFT,
+          CENTER,
+          3
+        );
+        setButtonEnabled("Module Buy Button " + (b + 1), true);
+      }
+
+    if (validModules.length > 5) {
+      newButton(
+        "Down Button",
+        "🡇",
+        30,
+        230 + xOffset,
+        415 + yOffset,
+        40,
+        40,
+        themeSecondary,
+        color(10, 10, 15),
+        themeSecondary,
+        color(10, 10, 15),
+        1,
+        function () {
+          if (TS + 5 < validCommods.length) {
+            TS++;
+            updateModuleButtons()
+          }
+        },
+        CENTER,
+        CENTER,
+        0
+      );
+      setButtonEnabled("Down Button", true);
+
+      newButton(
+        "Up Button",
+        "🡅",
+        30,
+        230 + xOffset,
+        90 + yOffset,
+        40,
+        40,
+        themeSecondary,
+        color(10, 10, 15),
+        themeSecondary,
+        color(10, 10, 15),
+        1,
+        function () {
+          if (TS > 0) {
+            TS--;
+            updateModuleButtons()
+          }
+        },
+        CENTER,
+        CENTER,
+        0
+      );
+      setButtonEnabled("Up Button", true);
+    }
+    
   }
+
     buttonsLoaded = true;
   }
 
@@ -642,6 +755,41 @@ function stationScreen(){
         );
       }
     }
+  } else if(sTab == "modules"){
+    if (validModules.length > 5) {
+      const Start = 150;
+      const End = 400;
+
+      fill(10, 10, 15);
+      stroke(themeSecondary);
+      rect(230.5 + xOffset, Start + yOffset, 40, End - Start);
+
+      fill(themeSecondary);
+      stroke(themeSecondary);
+      rect(
+        230.5 + xOffset,
+        Start + yOffset +
+          ((End - Start) / validModules.length) * TS +
+          0.5,
+        40,
+        ((End - Start) / validModules.length) * 5
+      );
+    }
+
+    stroke(themeSecondary);
+    line(280.5 + xOffset, 80.5 + yOffset, 280.5 + xOffset, 470 + yOffset);
+
+    if (sComm != "null") {
+
+      textSize(15);
+      noStroke();
+      fill(themeSecondary);
+      text(validModules[sComm].description, 290.5 + xOffset, 90.5 + yOffset, 170, 200);
+      
+
+    }
+    
+
   }
 
   noStroke();
