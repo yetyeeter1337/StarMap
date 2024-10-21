@@ -98,7 +98,19 @@ function stationScreen(){
           )
         }
       }
-    }
+      
+
+      if(sComm != "null" ){
+        let stationOffset
+        for(let i = 0; i < stations[Pstar][Pstation][5].length; i++){
+            if(stations[Pstar][Pstation][5][i][0] == validModules[sComm].name) stationOffset = stations[Pstar][Pstation][5][i][1]
+            
+        }
+        if(validModules[sComm].price + stationOffset < credits && modules.length < maxModules){ setButtonEnabled("Purchase Button", true) } else { setButtonEnabled("Purchase Button", false) }
+      } else {
+        setButtonEnabled("Purchase Button", false)
+      }
+    } 
   
     clearButtons();
     // newButton(name,displayText,textsize,X,Y,W,H,Col1,Col2,ColP1,ColP2,bWidth,func,alx,aly,pad)
@@ -667,6 +679,41 @@ function stationScreen(){
       );
       setButtonEnabled("Up Button", true);
     }
+
+    newButton(
+      "Purchase Button",
+      "Purchase Module",
+      20,
+      290 + xOffset,
+      430 + yOffset,
+      170,
+      30,
+      themeSecondary,
+      color(10, 10, 15),
+      themeTertiary,
+      color(10, 10, 15),
+      1,
+      function () {
+        if (sComm != "null") {
+          let stationOffset
+          for(let i = 0; i < stations[Pstar][Pstation][5].length; i++){
+              if(stations[Pstar][Pstation][5][i][0] == validModules[sComm].name) stationOffset = stations[Pstar][Pstation][5][i][1]
+              
+          }
+          
+          let price = validModules[sComm].price + stationOffset
+          print("attempting purchase")
+          if(credits >= price && modules.length < maxModules){
+            credits -= price
+            installShipModule(validModules[sComm].name)
+            consoleMessage("transaction successful, " + price + " credits deducted from account", 5)
+          }
+          updateButtons()
+        }
+      }
+    );
+    setButtonEnabled("Purchase Button", true);
+
     
   }
 
@@ -785,6 +832,25 @@ function stationScreen(){
       noStroke();
       fill(themeSecondary);
       text(validModules[sComm].description, 290.5 + xOffset, 90.5 + yOffset, 170, 200);
+
+      stroke(100)
+      strokeWeight(1)
+      noFill()
+      rect(290 + xOffset,
+        430 + yOffset,
+        170,
+        30,)
+
+      textSize(25)
+      noStroke()
+      fill(100)
+      // set text for reason for being unable to purchase
+
+      let errormessage
+      text("unable to purchase",290 + xOffset,
+        430 + yOffset,
+        170,
+        30,)
       
 
     }

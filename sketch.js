@@ -300,13 +300,13 @@ let moduleTypes = [
 function installShipModule(moduleName){
   if(modules.length < maxModules){
     let moduleFound = false
-    for(let i = 1; i < moduleTypes.length; i++){
+    for(let i = 0; i < moduleTypes.length; i++){
       if(moduleTypes[i].name == moduleName){
         modules[modules.length] = Object.assign({},moduleTypes[i])
         moduleFound = true
       }
     }
-    if(!moduleFound) return
+    if(!moduleFound) { print("no module found: " + moduleName); return }
     modules[modules.length - 1].onInstall()
   }
 }

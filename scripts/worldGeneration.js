@@ -281,13 +281,13 @@ function generateWorld(){
 
       // make the station sell ship modules
       stations[i][s][5] = []
-      for(let m = 0; m < modules.length; m++){
+      for(let m = 0; m < moduleTypes.length; m++){
         let canSell = false
         // I got a bit silly with the variable name, but this just checks the module's table of what type of station it can be sold at
-        for(let toomanysingleletterindicies = 0; toomanysingleletterindicies < modules[m].soldAt.length; toomanysingleletterindicies++){
-          if(modules[m].soldAt[toomanysingleletterindicies] == stations[i][s][0] || modules[m].soldAt[toomanysingleletterindicies] == "anywhere") canSell = true
+        for(let toomanysingleletterindicies = 0; toomanysingleletterindicies < moduleTypes[m].soldAt.length; toomanysingleletterindicies++){
+          if(moduleTypes[m].soldAt[toomanysingleletterindicies] == stations[i][s][0] || moduleTypes[m].soldAt[toomanysingleletterindicies] == "anywhere") canSell = true
         }
-        stations[i][s][5][stations[i][s][5].length] = [modules[m].name, round(modules[m].price*0.1*random(-1,1))]
+        stations[i][s][5][stations[i][s][5].length] = [moduleTypes[m].name, round(moduleTypes[m].price*0.1*random(-1,1))]
       }
       // I am beginning to realize that the universe generation code is absolute spaggetti array hell and it is entirely my fault :P
     }
