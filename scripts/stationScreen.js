@@ -106,7 +106,8 @@ function stationScreen(){
             if(stations[Pstar][Pstation][5][i][0] == validModules[sComm].name) stationOffset = stations[Pstar][Pstation][5][i][1]
             
         }
-        if(validModules[sComm].price + stationOffset < credits && modules.length < maxModules){ setButtonEnabled("Purchase Button", true) } else { setButtonEnabled("Purchase Button", false) }
+        setButtonEnabled("Purchase Button", true)
+        if(validModules[sComm].price + stationOffset > credits || modules.length >= maxModules){ setButtonEnabled("Purchase Button", false) }
       } else {
         setButtonEnabled("Purchase Button", false)
       }
@@ -708,7 +709,7 @@ function stationScreen(){
             installShipModule(validModules[sComm].name)
             consoleMessage("transaction successful, " + price + " credits deducted from account", 5)
           }
-          updateButtons()
+          updateModuleButtons()
         }
       }
     );
@@ -841,16 +842,30 @@ function stationScreen(){
         170,
         30,)
 
+      let stationOffset
+      for(let i = 0; i < stations[Pstar][Pstation][5].length; i++){
+          if(stations[Pstar][Pstation][5][i][0] == validModules[sComm].name) stationOffset = stations[Pstar][Pstation][5][i][1]
+          
+      }
+      let price = validModules[sComm].price + stationOffset
+        
       textSize(25)
+      textAlign(CENTER,CENTER)
       noStroke()
       fill(100)
       // set text for reason for being unable to purchase
 
-      let errormessage
-      text("unable to purchase",290 + xOffset,
+
+      let errormessage = "unable to purchase"
+      if(credits < price) errormessage = "insufficient credits"
+      if(modules.length >= maxModules) errormessage = "no slots availible"
+      
+      text(errormessage,290 + xOffset,
         430 + yOffset,
         170,
         30,)
+
+      
       
 
     }
@@ -858,6 +873,7 @@ function stationScreen(){
 
   }
 
+  
   noStroke();
   fill(themePrimary);
   textSize(13);
@@ -890,7 +906,7 @@ function stationScreen(){
   }
 
   // hull integrity and repairs
-
+  textAlign(LEFT, CENTER);
   noStroke();
   fill(themePrimary);
   textSize(13);
