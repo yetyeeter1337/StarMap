@@ -685,15 +685,15 @@ function stationScreen(){
       "Purchase Button",
       "Purchase Module",
       20,
-      290 + xOffset,
-      430 + yOffset,
+      289.5 + xOffset,
+      269.5 + yOffset,
       170,
       30,
       themeSecondary,
       color(10, 10, 15),
       themeTertiary,
       color(10, 10, 15),
-      1,
+      2,
       function () {
         if (sComm != "null") {
           let stationOffset
@@ -714,6 +714,26 @@ function stationScreen(){
       }
     );
     setButtonEnabled("Purchase Button", true);
+
+    for(let i = 0; i < 2; i++){
+      if(i + sModScroll < maxModules){
+        let modumeName
+        if(modules[i + sModScroll]??false){
+          moduleName = modules[i + Mscroll].name
+        } else {
+          moduleName = "none"
+        }
+        newButton("Module Button "+i,moduleName,18,
+        xOffset + 350, yOffset + 90 + (i*30),
+            250, 25,
+            themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
+        function(){
+            sMod = i + sModScroll
+            
+        }, LEFT, TOP, 3)
+        setButtonEnabled("Module Button "+i, true)
+      }
+    }
 
     
   }
@@ -748,7 +768,7 @@ function stationScreen(){
     stroke(themeSecondary);
     line(290.5 + xOffset, 80.5 + yOffset, 290.5 + xOffset, 470.5 + yOffset);
 
-    line(290.5 + xOffset, 210.5 + yOffset, 470.5 + xOffset, 210.5 + yOffset);
+    line(300.5 + xOffset, 210.5 + yOffset, 460.5 + xOffset, 210.5 + yOffset);
 
     noStroke();
     fill(themeSecondary);
@@ -832,13 +852,19 @@ function stationScreen(){
       textSize(15);
       noStroke();
       fill(themeSecondary);
-      text(validModules[sComm].description, 290.5 + xOffset, 90.5 + yOffset, 170, 200);
+      text(validModules[sComm].description, 290.5 + xOffset, 90.5 + yOffset, 170, 150);
+
+      noFill()
+      stroke(themeSecondary)
+      strokeWeight(1)
+      line( 290.5 + xOffset, 90.5 + yOffset + 150, 290.5 + xOffset + 170, 90.5 + yOffset + 150 )
+      line( 290.5 + xOffset, 310.5 + yOffset, 290.5 + xOffset + 170, 310.5 + yOffset )
 
       stroke(100)
       strokeWeight(1)
       noFill()
       rect(290 + xOffset,
-        430 + yOffset,
+        270 + yOffset,
         170,
         30,)
 
@@ -848,8 +874,14 @@ function stationScreen(){
           
       }
       let price = validModules[sComm].price + stationOffset
+
+      textSize(16)
+      noStroke()
+      textAlign(LEFT, CENTER)
+      fill(themeSecondary)
+      text("price: "+price, 290 + xOffset, 255 + yOffset)
         
-      textSize(25)
+      textSize(18)
       textAlign(CENTER,CENTER)
       noStroke()
       fill(100)
@@ -861,7 +893,7 @@ function stationScreen(){
       if(modules.length >= maxModules) errormessage = "no slots availible"
       
       text(errormessage,290 + xOffset,
-        430 + yOffset,
+        270 + yOffset,
         170,
         30,)
 
@@ -874,6 +906,7 @@ function stationScreen(){
   }
 
   
+  textAlign(LEFT,CENTER)
   noStroke();
   fill(themePrimary);
   textSize(13);

@@ -8,7 +8,7 @@
 
 
 /*
-// load fonts
+// (don't) load fonts
 var tomorrow_light;
 var tomorrow_medium;
 function preload() {
@@ -309,6 +309,10 @@ function installShipModule(moduleName){
     if(!moduleFound) { print("no module found: " + moduleName); return }
     modules[modules.length - 1].onInstall()
   }
+}
+
+function uninstallShipModule(index){
+
 }
 
 let commod = [
@@ -1330,6 +1334,7 @@ function tradePrice(BS, staComm, amount) {
   return cost;
 }
 
+// a bunch of random variables
 var dis = 0;
 var Bdis = 1000;
 var cS = "null";
@@ -1345,6 +1350,8 @@ var sTab = "buy"
 var Tmult = 1;
 var buysell = 1;
 var cart = 0;
+var sMod = 0;
+var sModScroll = 0;
 
 let timers = [];
 
