@@ -724,8 +724,8 @@ function stationScreen(){
           moduleName = "none"
         }
         newButton("Module Button "+i,moduleName,18,
-        xOffset + 350, yOffset + 90 + (i*30),
-            250, 25,
+        xOffset + 290, yOffset + 320 + (i*30),
+            170, 25,
             themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
         function(){
             sMod = i + sModScroll
