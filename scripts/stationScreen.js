@@ -68,7 +68,7 @@ function stationScreen(){
           Text =
             Text +
             "\n price: " +
-            prices[TS + b] +
+            round(tradePrice(sTab=="buy", validCommods[TS + b], 1),2) +
             "\n stock: " +
             validCommods[TS + b][2] + 
             "\n in cargo: " + getCargo(validCommods[TS + b][0]);
@@ -290,7 +290,7 @@ function stationScreen(){
         Text =
           Text +
           "\n price: " +
-          prices[TS + b] +
+          round(tradePrice(sTab=="buy", validCommods[TS + b], 1), 2) +
           "\n stock: " +
           validCommods[TS + b][2];
         newButton(
@@ -598,6 +598,7 @@ function stationScreen(){
             cargo = addCargo(validCommods[sComm][0], cart)[0];
             validCommods[sComm][2] -= cart;
           } else if (buysell == 2) {
+            P = tradePrice(false, validCommods[sComm], cart);
             credits += P;
             consoleMessage("transaction successful, " + round(P,2) + " credits added to account", 5)
             cargo = removeCargo(
@@ -840,7 +841,7 @@ function stationScreen(){
 
       textSize(13);
       text(validCommods[sComm][0], 300.5 + xOffset, 90.5 + yOffset);
-      text("Price: " + prices[sComm] + " credits", 300.5 + xOffset, 110.5 + yOffset);
+      text("Price: " + round(tradePrice(true, validCommods[sComm], cart), 2)+ " credits", 300.5 + xOffset, 110.5 + yOffset);
       text("Weight: " + comdat[4], 300.5 + xOffset, 130.5 + yOffset);
       text(
         "Stock: " + validCommods[sComm][2],
@@ -869,13 +870,13 @@ function stationScreen(){
       text("Cart: " + cart, 300 + xOffset, 340 + yOffset);
       if (buysell == 1) {
         text(
-          "Price: " + round(tradePrice(true, stationInv[sComm], cart), 2),
+          "Price: " + round(tradePrice(true, validCommods[sComm], cart), 2),
           300 + xOffset,
           355 + yOffset
         );
       } else if (buysell == 2) {
         text(
-          "Price: " + round(tradePrice(false, stationInv[sComm], cart), 2),
+          "Price: " + round(tradePrice(false, validCommods[sComm], cart), 2),
           300 + xOffset,
           355 + yOffset
         );
