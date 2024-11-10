@@ -155,9 +155,9 @@ let moduleTypes = [
       if(!this.working && this.water > 0) {
         this.working = true
         this.water -= 1
-        resetTimer("Algae Timer")
+        resetTimer("Algae Timer " + this.timerindex)
       }
-      if(this.working)this.progress = min(round(getTimer("Algae Timer")/20,3) * 100, 100)
+      if(this.working)this.progress = min(round(getTimer("Algae Timer " + this.timerindex)/20,3) * 100, 100)
       if(this.progress >= 100 && this.algae < 150 && this.working){
         this.algae += 3
         this.working = false
