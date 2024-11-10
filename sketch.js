@@ -117,6 +117,7 @@ let moduleTypes = [
     stackSize: 50,
     processing: null,
     progress: 0,
+    defaultTime: 5,
     timerindex: 0,
     onInstall: function() {
       newTimer("refinery timer " + TIMERINDEX)
@@ -127,10 +128,67 @@ let moduleTypes = [
       removeTimer("refinery timer " + this.timerindex)
     },
     update: function(){
+      // check if the refinery is processing anything, and if it isn't, check if it can start processing something
+      if(this.processing == null){
+
+        let recipe = getRefineForInput(this.inputStack[0][0])
+
+        if(recipe){
+          this.processing = recipe
+        } else {
+
+          recipe = getRefineForInput(this.inputStack[1][0])
+          if(recipe){
+            this.processing = recipe
+          } else {
+            this.processing = null
+          }
+
+        }
+
+      }
+
+      // if there is a recipe to complete, begin progressing it
+      if(this.processing != null){
+        let recipe = recipes.refining[processing]
+        this.progress += deltaTime * recipe.speed
+
+        // check if the recipe has completed, and if so, attempt to complete the recipe
+        if(this.progress >= this.defaultTime)
+        {  
+          // attempt to complete the recipe, and record whether it succeded
+          let success = refine(this.processing, this.inputStack, this.outputStack)
+
+          // reset progress and recipe if successful, else, wait
+          if(success){
+            this.processing = null
+            this.progress = 0
+          } else {
+            this.progress = this.defaultTime
+          }}
+
+      }
 
     },
     screen: function(){
+      let SW = 700
+      let SH = 500
+      
+      let xo = round((windowWidth/2)-(SW/2)) + 0.5
+      let yo = round((windowHeight/2)-(SH/2)) + 0.5
+      
+      strokeWeight(1.5)
+      stroke(themePrimary);
+      fill(10,10,15)
+      rect(xo,yo,SW,SH)
 
+      // oh boy, here we go again
+      if(!buttonsLoaded){
+
+
+
+        buttonsLoaded = true
+      }
     }
   },
   AlgaeProductionUnitS = {
@@ -414,7 +472,8 @@ function getRefineForInput(input){ // returns the refining recipe for the given 
   return false
 }
 
-function refine( recipeName, cargoInput, cargoOutput){ // preforms a refining recipe using items from the input inventory and places the result in the output inventory (if possible)
+// preforms a refining recipe using items from the input inventory and places the result in the output inventory (if possible), returns whether it was successful
+function refine( recipeName, cargoInput, cargoOutput){ 
   /* check if:
   the input inventory has the correct amount of items
   the output inventory has enough space
@@ -430,6 +489,10 @@ function refine( recipeName, cargoInput, cargoOutput){ // preforms a refining re
       cargoInput = removeCargo(recipe.inputItem, recipe.inputQuantity, cargoInput)[0]
       cargoOutput = addCargo(recipe.outputItem, recipe.outputQuantity, cargoOutput)[0]
 
+      return true
+
+    } else {
+      return false
     }
 }
 
@@ -897,6 +960,7 @@ let JbuttonEnabled = false;
 let JbuttonHover = false;
 let SbuttonEnabled = true;
 let buttons = []; // first value in each table is the enabled value, 2nd is the button's name (NAMES SHOULD BE DIFFERENT)
+let fuelRequirement = 0
 
 let buttonsLoaded = false;
 
