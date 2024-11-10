@@ -7,25 +7,6 @@ function stationScreen(){
   fill(10,10,15)
   rect(xOffset,yOffset,700,500)
 
-  var prices = [];
-  for (let p = 0; p < stations[Pstar][Pstation][4].length; p++) {
-    if (stations[Pstar][Pstation][4].length > p) {
-      var demandMult =
-        stations[Pstar][Pstation][4][p][2] /
-        stations[Pstar][Pstation][4][p][1];
-      if (demandMult > 1.25) demandMult = 1.25;
-      if (demandMult < 0.75) demandMult = 0.75;
-
-      for (let i = 0; i < commod.length; i++) {
-        if (commod[i][0] == stations[Pstar][Pstation][4][p][0]) {
-          prices[p] =
-            commod[i][1] * demandMult + stations[Pstar][Pstation][4][p][3];
-        }
-      }
-      prices[p] = round(prices[p], 2);
-    }
-  }
-
   // get a list of commodities that can be sold at this station
   let validCommods = []
 
