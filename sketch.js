@@ -69,6 +69,9 @@ let industries = [
   "Organics",
   "Manufacturing",
 ];
+
+let TIMERINDEX = 0 // value that can be used if you don't want to accidentally duplicate timers
+
 // I was very close to just using arrays again
 // all modules should have an onInstall, onRemove, update, and screen function
 // a screen function is needed if the module needs an interface (Ex: the refinery needs an interface, cargo racks do not)
@@ -110,14 +113,18 @@ let moduleTypes = [
     soldAt: ["Mining","Refining","Technology","Manufacturing"],
     description: "Refines raw goods (Ex: ores into metals, algae into food, etc.)",
     inputStack: [["EMPTY"],["EMPTY"]],
-    outputStack: [["EMPTY"],["EMPTY"]],
+    outputStack: [["EMPTY"],["EMPTY"],["EMPTY"],["EMPTY"]],
+    stackSize: 50,
     processing: null,
     progress: 0,
+    timerindex: 0,
     onInstall: function() {
-
+      newTimer("refinery timer " + TIMERINDEX)
+      this.timerindex = TIMERINDEX
+      TIMERINDEX++
     },
     onRemove: function() {
-
+      removeTimer("refinery timer " + this.timerindex)
     },
     update: function(){
 
@@ -134,12 +141,15 @@ let moduleTypes = [
     water: 0,
     algae: 0,
     progress: 0,
+    timerindex: 0,
     working: false,
     onInstall: function() {
-      newTimer("Algae Timer")
+      newTimer("Algae Timer " + TIMERINDEX)
+      this.timerindex = TIMERINDEX
+      TIMERINDEX++
     },
     onRemove: function() {
-      removeTimer("Algae Timer")
+      removeTimer("Algae Timer " + this.timerindex)
     },
     update: function(){
       if(!this.working && this.water > 0) {
@@ -312,7 +322,10 @@ function installShipModule(moduleName){
 }
 
 function uninstallShipModule(index){
-
+  if(modules[index] != null){
+    modules[index].onRemove()
+    modules.splice(index,1)
+  }
 }
 
 let commod = [
@@ -383,14 +396,43 @@ let commod = [
   ["Solar Panels", 25, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
 ];
 
-var smeltables = [
-  [2, "Iron Ore", 1, "Iron"],
-  [2, "Copper Ore", 1, "Copper"],
-  [2, "Carbon Ore", 1, "Carbon"],
-  [3, "Gold Ore", 1, "Gold"],
-  [2, "Ice", 1, "Water"],
-  [2,"Algae",1,"FOODSNACK™"]
-];
+var recipes = {
+  refining: {}
+}
+
+recipes.refining.iron = {inputItem: "Iron Ore", inputQuantity: 2, outputItem: "Iron", outputQuantity: 1, speed: 1}
+recipes.refining.copper = {inputItem: "Copper Ore", inputQuantity: 2, outputItem: "Copper", outputQuantity: 1, speed: 1}
+recipes.refining.carbon = {inputItem: "Carbon Ore", inputQuantity: 2, outputItem: "Carbon", outputQuantity: 1, speed: 1}
+recipes.refining.gold = {inputItem: "Gold Ore", inputQuantity: 3, outputItem: "Gold", outputQuantity: 1, speed: 1}
+recipes.refining.ice = {inputItem: "Ice", inputQuantity: 3, outputItem: "Water", outputQuantity: 2, speed: 1.25}
+recipes.refining.food = {inputItem: "Algae", inputQuantity: 2, outputItem: "FOODSNACK™", outputQuantity: 1, speed: 2}
+
+function getRefineForInput(input){ // returns the refining recipe for the given input good, if it exists
+  for(const recipe in recipes.refining){
+    if(recipes.refining[recipe].inputItem == input) return recipe
+  }
+  return false
+}
+
+function refine( recipeName, cargoInput, cargoOutput){ // preforms a refining recipe using items from the input inventory and places the result in the output inventory (if possible)
+  /* check if:
+  the input inventory has the correct amount of items
+  the output inventory has enough space
+  */
+  recipe = recipes.refining[recipeName]??false
+  if(!recipe) { print("attempted to preform nonexistent refining recipe: "+recipeName); return}
+  if( removeCargo(recipe.inputItem, recipe.inputQuantity, cargoInput)[2] == recipe.inputQuantity
+      &&
+      addCargo(recipe.outputItem, recipe.outputQuantity, cargoOutput)[2] == recipe.outputQuantity 
+    )
+    {
+
+      cargoInput = removeCargo(recipe.inputItem, recipe.inputQuantity, cargoInput)[0]
+      cargoOutput = addCargo(recipe.outputItem, recipe.outputQuantity, cargoOutput)[0]
+
+    }
+}
+
 function deepCopy(array) {
   return JSON.parse(JSON.stringify(array));
 }
@@ -1109,7 +1151,10 @@ function setup() {
     cargo[i] = ["EMPTY"];
   }
 
-  installShipModule("Algae Production Unit S")
+  
+  // on load test code goes here
+
+
 }
 
 // give the star system index and the station index and the commodity name and return the station's commodity data
@@ -1125,9 +1170,10 @@ function findCommodity(starSystem, station, commodity) {
 // cargo functions
 
 // returns a table of [0 = resulting cargo, 1 = success, 2 = items added]
-function addCargo(commodityName, count, CARGO) {
+function addCargo(commodityName, count, CARGO, STACKSIZE) {
   
   CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+  STACKSIZE = STACKSIZE??maxStack // same thing here
 
   let spaceAvailable = false;
   let availableRoom = 0;
@@ -1140,7 +1186,7 @@ function addCargo(commodityName, count, CARGO) {
 
   // error handling
   if (commodityName == "EMPTY") {
-    print('DONT TRY TO ADD "EMPTY" YOU IDIOT!');
+    print('cannot add EMPTY to cargo');
     return [CARGO, false, 0];
   }
   if (item == null) {
@@ -1156,12 +1202,12 @@ function addCargo(commodityName, count, CARGO) {
   for (let i = 0; i < CARGO.length; i++) {
     if (CARGO[i][0] == "EMPTY") {
       spaceAvailable = true;
-      availableRoom += floor(maxStack / item[4]);
+      availableRoom += floor(STACKSIZE / item[4]);
     }
 
-    if (CARGO[i][0] == item[0] && CARGO[i][1] <= floor(maxStack / item[4])) {
+    if (CARGO[i][0] == item[0] && CARGO[i][1] <= floor(STACKSIZE / item[4])) {
       spaceAvailable = true;
-      availableRoom += floor(maxStack / item[4]) - CARGO[i][1];
+      availableRoom += floor(STACKSIZE / item[4]) - CARGO[i][1];
     }
   }
 
@@ -1179,10 +1225,10 @@ function addCargo(commodityName, count, CARGO) {
 
   for (let i = 0; i < newCargo.length; i++) {
     if (newCargo[i][0] == "EMPTY") {
-      if (cargoToAdd >= floor(maxStack / item[4])) {
+      if (cargoToAdd >= floor(STACKSIZE / item[4])) {
         newCargo[i][0] = item[0];
-        newCargo[i][1] = floor(maxStack / item[4]);
-        cargoToAdd -= floor(maxStack / item[4]);
+        newCargo[i][1] = floor(STACKSIZE / item[4]);
+        cargoToAdd -= floor(STACKSIZE / item[4]);
       } else if (cargoToAdd > 0) {
         newCargo[i][0] = item[0];
         newCargo[i][1] = cargoToAdd;
@@ -1191,10 +1237,10 @@ function addCargo(commodityName, count, CARGO) {
     }
 
     if (newCargo[i][0] == item[0]) {
-      if (cargoToAdd >= floor(maxStack / item[4]) - newCargo[i][1]) {
+      if (cargoToAdd >= floor(STACKSIZE / item[4]) - newCargo[i][1]) {
         newCargo[i][0] = item[0];
-        cargoToAdd -= floor(maxStack / item[4]) - newCargo[i][1];
-        newCargo[i][1] = floor(maxStack / item[4]);
+        cargoToAdd -= floor(STACKSIZE / item[4]) - newCargo[i][1];
+        newCargo[i][1] = floor(STACKSIZE / item[4]);
       } else if (cargoToAdd > 0) {
         newCargo[i][0] = item[0];
         newCargo[i][1] += cargoToAdd;
@@ -1222,7 +1268,7 @@ function removeCargo(commodityName, count, CARGO) {
 
   // error handling
   if (commodityName == "EMPTY") {
-    print('DONT TRY TO REMOVE "EMPTY" YOU IDIOT!');
+    print('cannot remove EMPTY from cargo');
     return [CARGO, false, 0];
   }
   if (!cargoFound) {
@@ -1284,7 +1330,9 @@ function getCargo(commodityName, CARGO) {
 }
 
 // returns an array of [*cargo size [0 = % full, 1 = commod color]]
-function displayCargo(Cargo) {
+function displayCargo(Cargo, STACKSIZE) {
+
+  STACKSIZE = STACKSIZE??maxStack
   let cargoDisplay = [];
   for (let i = 0; i < Cargo.length; i++) {
     cargoDisplay[i] = [];
@@ -1293,7 +1341,7 @@ function displayCargo(Cargo) {
       cargoDisplay[i][1] = color(100);
     } else {
       let com = getCommodity(Cargo[i][0]);
-      cargoDisplay[i][0] = (Cargo[i][1] * com[4]) / maxStack;
+      cargoDisplay[i][0] = (Cargo[i][1] * com[4]) / STACKSIZE;
       cargoDisplay[i][1] = com[5];
     }
   }
@@ -2162,8 +2210,8 @@ function draw() {
           case "Refining":
             // get the commodities that can be smelted
             let smeltable = [];
-            for (let i = 0; i < smeltables.length; i++) {
-              if(findCommodity(ss, s, smeltables[i][1])) smeltable[smeltable.length] = smeltables[i][1];
+            for (const recipe in recipes.refining) {
+              if(findCommodity(ss, s, recipes.refining[recipe].inputItem)) smeltable[smeltable.length] = recipes.refining[recipe];
             }
 
             // smelt [NUMBER] smeltable commodites and exchange them for their smelted form
@@ -2171,17 +2219,17 @@ function draw() {
             for (let i = 0; i < toSmelted; i++) {
               let toSmelt = round(random(0, smeltable.length - 1));
               if (
-                findCommodity(ss, s, smeltable[toSmelt])[2] >=
-                  smeltables[toSmelt][0] &&
-                findCommodity(ss, s, smeltables[toSmelt][3])[1] -
-                  findCommodity(ss, s, smeltables[toSmelt][3])[2] >=
-                  smeltables[toSmelt][2]
+                findCommodity(ss, s, smeltable[toSmelt].inputItem)[2] >=
+                  smeltable[toSmelt].inputQuantity
+                &&
+                findCommodity(ss, s, smeltable[toSmelt].outputItem)[1] - findCommodity(ss, s, smeltable[toSmelt].outputItem)[2] >=
+                  smeltable[toSmelt].outputQuantity
               ) {
                 // checks if there is enough to smelt and if there is enough room for the output
-                findCommodity(ss, s, smeltable[toSmelt])[2] -=
-                  smeltables[toSmelt][0];
-                findCommodity(ss, s, smeltables[toSmelt][3])[2] +=
-                  smeltables[toSmelt][2];
+                findCommodity(ss, s, smeltable[toSmelt].inputItem)[2] -=
+                  smeltable[toSmelt].inputQuantity;
+                findCommodity(ss, s, smeltable[toSmelt].outputItem)[2] +=
+                  smeltable[toSmelt].outputQuantity;
               }
             }
 

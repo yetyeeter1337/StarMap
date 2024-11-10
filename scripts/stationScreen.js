@@ -111,6 +111,24 @@ function stationScreen(){
       } else {
         setButtonEnabled("Purchase Button", false)
       }
+
+      for (let b = 0; b < 2; b++) {
+          var Text 
+          if(modules[b + sModScroll]??false){
+            Text = modules[b + Mscroll].name
+          } else {
+            Text = "none"
+          }
+          setButtonText("Module Button " + (b), Text);
+
+          if(sMod == sModScroll + b){
+            setButtonColors("Module Button " + (b), themeTertiary,color(10, 10, 15), themeTertiary, color(10, 10, 15))
+          } else {
+            setButtonColors("Module Button " + (b), themeSecondary,color(10, 10, 15), themeSecondary, color(10, 10, 15))
+          }
+        
+      }
+
     } 
   
     clearButtons();
@@ -723,19 +741,59 @@ function stationScreen(){
         } else {
           moduleName = "none"
         }
-        newButton("Module Button "+i,moduleName,18,
+        newButton("Module Button "+i,moduleName,16,
         xOffset + 290, yOffset + 320 + (i*30),
             170, 25,
             themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
         function(){
             sMod = i + sModScroll
+            updateModuleButtons()
             
         }, LEFT, TOP, 3)
         setButtonEnabled("Module Button "+i, true)
       }
     }
 
-    
+    // scroll through installed modules
+    newButton("Module Select Button left","<",18,
+      xOffset + 290, yOffset + 380,
+          30, 25,
+          themeSecondary,color(10,10,15),themeTertiary,color(10,10,15),2,
+      function(){
+          if(sModScroll > 0) sModScroll--
+          updateModuleButtons()
+          
+      }, CENTER, CENTER, 3)
+    setButtonEnabled("Module Select Button left", true)
+
+    newButton("Module Select Button right",">",18,
+      xOffset + 430, yOffset + 380,
+          30, 25,
+          themeSecondary,color(10,10,15),themeTertiary,color(10,10,15),2,
+      function(){
+          if(sModScroll < maxModules - 2) sModScroll++
+          updateModuleButtons()
+          
+      }, CENTER, CENTER, 3)
+    setButtonEnabled("Module Select Button right", true)
+
+    //uninstall selected module
+    newButton("Uninstall Module Button","uninstall",18,
+      xOffset + 290, yOffset + 415,
+          170, 30,
+          themeTertiary,color(10,10,15),themeTertiary,color(10,10,15),2,
+      function(){
+          if(modules[sMod] != null){
+            consoleMessage( modules[sMod].name + " uninstalled, " + ceil(modules[sMod].price) + " credits added to account.")
+            credits += ceil(modules[sMod].price/2)
+            uninstallShipModule(sMod)
+          }
+          updateModuleButtons()
+          
+      }, CENTER, CENTER, 3)
+    setButtonEnabled("Uninstall Module Button", true)
+
+    updateModuleButtons()
   }
 
     buttonsLoaded = true;
@@ -880,6 +938,19 @@ function stationScreen(){
       textAlign(LEFT, CENTER)
       fill(themeSecondary)
       text("price: "+price, 290 + xOffset, 255 + yOffset)
+
+      let refund
+      if(isNaN(modules[sMod]?.price)){
+        refund = "N/A"
+      } else {
+        refund = ceil(modules[sMod].price/2)
+      }
+      textSize(14)
+      text("Refund: "+refund , xOffset + 290, yOffset + 450, 170, 25,)
+
+      textAlign(CENTER, CENTER)
+      text((sModScroll + 2) + "/" + maxModules,xOffset + 290, yOffset + 380,
+      170, 25)
         
       textSize(18)
       textAlign(CENTER,CENTER)
