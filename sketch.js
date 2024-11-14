@@ -182,10 +182,52 @@ let moduleTypes = [
       fill(10,10,15)
       rect(xo,yo,SW,SH)
 
+      let dispCargo = displayCargo(cargo)
+
+      let cargoButtons = 8
+      let buttonDistance = 30
+
       // oh boy, here we go again
       if(!buttonsLoaded){
+        clearButtons();
 
+        Cscroll = 0
 
+        for(let i = 0; i < cargoButtons; i++){
+          newButton("Cargo Button "+i,"",1,
+          xo + 20, yo + 90 + (i*buttonDistance),
+              250, 25,
+              dispCargo[i + Cscroll][1],color(10,10,15),dispCargo[i + Cscroll][1],color(10,10,15),2,
+          function(){
+              escargo = Cscroll + i
+          }, CENTER, CENTER)
+          setButtonEnabled("Cargo Button "+i, true)
+        }
+
+        newButton("Up Button","🡅",20, xo + 275 - 0.5, yo + 90 - 0.5, 25, 25,
+          themePrimary,color(10,10,15),themePrimary,color(10,10,15),1,
+          function(){
+  
+              if(Cscroll > 0) Cscroll --
+  
+              clearButtons()
+              buttonsLoaded = false
+  
+          }
+        )
+        setButtonEnabled("Up Button", true)
+  
+        newButton("Down Button","🡇",20, xo + 275 - 0.5, yo + 90 - 0.5 + (buttonDistance * (cargoButtons - 1)), 25, 25,
+          themePrimary,color(10,10,15),themePrimary,color(10,10,15),1,
+          function(){
+  
+              if(Cscroll + cargoButtons < cargoSlots) Cscroll ++
+  
+              clearButtons()
+              buttonsLoaded = false
+  
+          }
+        )
 
         buttonsLoaded = true
       }
@@ -413,7 +455,7 @@ let commod = [
   ],
   [
     "Unenriched Uranium",
-    10,
+    4,
     ["Mining", "Refining", "Technology", "Manufacturing"],
     ["Refining"],
     5,
@@ -421,10 +463,10 @@ let commod = [
   ],
   [
     "Enriched Uranium",
-    25,
+    6,
     ["Mining", "Refining", "Technology"],
     ["Refining", "Technology"],
-    5,
+    7,
     [0, 240, 100],
   ],
   [
@@ -451,7 +493,7 @@ let commod = [
   ["Algae", 1, ["Technology"], ["Organics"], 1, [0, 130, 100]],
   ["FOODSNACK™", 5, ["anywhere"], ["Organics"], 1, [0, 150, 100]],
   ["Processors", 20, ["anywhere"], ["Technology"], 2, [230, 230, 230]],
-  ["Solar Panels", 25, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
+  ["Solar Panels", 35, ["anywhere"], ["Technology"], 10, [10, 230, 230]],
 ];
 
 var recipes = {
@@ -460,7 +502,7 @@ var recipes = {
 
 recipes.refining.iron = {inputItem: "Iron Ore", inputQuantity: 2, outputItem: "Iron", outputQuantity: 1, speed: 1}
 recipes.refining.copper = {inputItem: "Copper Ore", inputQuantity: 2, outputItem: "Copper", outputQuantity: 1, speed: 1}
-recipes.refining.carbon = {inputItem: "Carbon Ore", inputQuantity: 2, outputItem: "Carbon", outputQuantity: 1, speed: 1}
+recipes.refining.carbon = {inputItem: "Carbon Ore", inputQuantity: 3, outputItem: "Carbon", outputQuantity: 2, speed: 1}
 recipes.refining.gold = {inputItem: "Gold Ore", inputQuantity: 3, outputItem: "Gold", outputQuantity: 1, speed: 1}
 recipes.refining.ice = {inputItem: "Ice", inputQuantity: 3, outputItem: "Water", outputQuantity: 2, speed: 1.25}
 recipes.refining.food = {inputItem: "Algae", inputQuantity: 2, outputItem: "FOODSNACK™", outputQuantity: 1, speed: 2}

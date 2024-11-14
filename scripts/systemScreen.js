@@ -202,9 +202,10 @@ function systemScreen(){
 
   // selecting
   Bdis = 1000;
+  
   if (mouseIsPressed && mouseX < 500) {
     dis = sqrt(abs(mouseX - (250 + xOffset)) ** 2 + abs(mouseY - (250 + yOffset)) ** 2);
-    if (dis <= 40) {
+    if (dis <= 30) {
       cP = "star";
       Bdis = dis;
     }

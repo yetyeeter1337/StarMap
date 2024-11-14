@@ -27,6 +27,8 @@ function shipScreen(){
     if(!buttonsLoaded){
       clearButtons();
       // newButton(name,displayText,textsize,X,Y,W,H,Col1,Col2,ColP1,ColP2,bWidth,func,alx,aly)
+
+      Cscroll = 0
       
       for(let i = 0; i < cargoButtons; i++){
         newButton("Cargo Button "+i,"",1,
