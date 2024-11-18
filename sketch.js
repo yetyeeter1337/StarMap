@@ -228,6 +228,7 @@ let moduleTypes = [
   
           }
         )
+        setButtonEnabled("Down Button", true)
 
         buttonsLoaded = true
       }
@@ -2344,8 +2345,7 @@ function draw() {
       }
     }
 
-    //DEBUG, DELETE ONCE FINISHED
-    print(stations);
+    
 
     resetTimer("Restock");
   }
