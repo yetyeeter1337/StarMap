@@ -119,6 +119,7 @@ let moduleTypes = [
     progress: 0,
     defaultTime: 5,
     timerindex: 0,
+    selectedStack: 0,
     onInstall: function() {
       newTimer("refinery timer " + TIMERINDEX)
       this.timerindex = TIMERINDEX
@@ -230,8 +231,71 @@ let moduleTypes = [
         )
         setButtonEnabled("Down Button", true)
 
+        newButton("Add Stack","Add Stack",20, xo + 20 - 0.5, yo + 330, 120, 25,
+          themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
+          function(){
+  
+              
+  
+              clearButtons()
+              buttonsLoaded = false
+  
+          }
+        )
+        setButtonEnabled("Add Stack", true)
+
+
+        newButton("Add 10","Add 10",20, xo + 150 - 0.5, yo + 330, 120, 25,
+          themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
+          function(){
+  
+              if(Cscroll + cargoButtons < cargoSlots) Cscroll ++
+  
+              clearButtons()
+              buttonsLoaded = false
+  
+          }
+        )
+        setButtonEnabled("Add 10", true)
+
         buttonsLoaded = true
       }
+
+      for(let i = 0; i < cargoButtons; i++){
+        drawButton("Cargo Button "+i)
+        rect(xo + 45, yo + 110 + (i*buttonDistance), 225 * dispCargo[i + Cscroll][0],5)
+        noFill()
+        stroke(themePrimary)
+        strokeWeight(1)
+        line(xo + 45, yo + 90 + (i*buttonDistance),
+            xo + 45, yo + 115 + (i*buttonDistance))
+        line(xo + 45, yo + 110 + (i*buttonDistance),
+            xo + 270, yo + 110 + (i*buttonDistance))
+            noStroke()
+            fill(themePrimary)
+            textAlign(LEFT,CENTER)
+            textSize(10)
+            text(cargo[i + Cscroll][0],xo + 50, yo + 90 + (i*buttonDistance),220, 25)
+            textSize(15)
+            textAlign(CENTER,CENTER)
+            text(cargo[i + Cscroll][1]??"",xo + 20, yo + 90 + (i*buttonDistance),25, 30)
+     }
+
+      rect(xo + 275, yo + 90, 25, 25)
+      rect(xo + 275, yo + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
+      rect(xo + 275, yo + 90 + (buttonDistance * (cargoButtons - 1)), 25, 25)
+      fill(themePrimary)
+      if(cargoButtons < cargoSlots){
+
+        let barLength = (buttonDistance * (cargoButtons - 2)) - 5
+        rect(xo + 275, yo + 120 + ( barLength/cargoSlots * Cscroll ), 25, barLength/cargoSlots * cargoButtons)
+
+      } else {
+        
+        rect(xo + 275, yo + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
+
+      }
+
     }
   },
   AlgaeProductionUnitS = {
@@ -1260,6 +1324,7 @@ function setup() {
 
   
   // on load test code goes here
+  installShipModule("Refinery S")
 
 
 }
@@ -1278,6 +1343,90 @@ function findCommodity(starSystem, station, commodity) {
 
 // returns a table of [0 = resulting cargo, 1 = success, 2 = items added]
 function addCargo(commodityName, count, CARGO, STACKSIZE) {
+  
+  CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
+  STACKSIZE = STACKSIZE??maxStack // same thing here
+
+  let spaceAvailable = false;
+  let availableRoom = 0;
+  let item;
+  for (let i = 0; i < commod.length; i++) {
+    if (commod[i][0] == commodityName) {
+      item = commod[i];
+    }
+  }
+
+  // error handling
+  if (commodityName == "EMPTY") {
+    print('cannot add EMPTY to cargo');
+    return [CARGO, false, 0];
+  }
+  if (item == null) {
+    print("no matching item!");
+    return [CARGO, false, 0];
+  }
+  if (count < 0) {
+    print("USE removeCargo TO REMOVE CARGO, NOT addCargo!");
+    return [CARGO, false, 0];
+  }
+
+  // check whether there is room available and how much more of the item it can hold
+  for (let i = 0; i < CARGO.length; i++) {
+    if (CARGO[i][0] == "EMPTY") {
+      spaceAvailable = true;
+      availableRoom += floor(STACKSIZE / item[4]);
+    }
+
+    if (CARGO[i][0] == item[0] && CARGO[i][1] <= floor(STACKSIZE / item[4])) {
+      spaceAvailable = true;
+      availableRoom += floor(STACKSIZE / item[4]) - CARGO[i][1];
+    }
+  }
+
+  // return the original cargo and failed if there is no room
+  if (!spaceAvailable) return [CARGO, false, 0];
+
+  let newCargo = JSON.parse(JSON.stringify(CARGO));
+  let cargoToAdd;
+  if (availableRoom >= count) {
+    cargoToAdd = count;
+  } else {
+    cargoToAdd = availableRoom;
+  }
+  let addedCargo = cargoToAdd;
+
+  for (let i = 0; i < newCargo.length; i++) {
+    if (newCargo[i][0] == "EMPTY") {
+      if (cargoToAdd >= floor(STACKSIZE / item[4])) {
+        newCargo[i][0] = item[0];
+        newCargo[i][1] = floor(STACKSIZE / item[4]);
+        cargoToAdd -= floor(STACKSIZE / item[4]);
+      } else if (cargoToAdd > 0) {
+        newCargo[i][0] = item[0];
+        newCargo[i][1] = cargoToAdd;
+        cargoToAdd = 0;
+      }
+    }
+
+    if (newCargo[i][0] == item[0]) {
+      if (cargoToAdd >= floor(STACKSIZE / item[4]) - newCargo[i][1]) {
+        newCargo[i][0] = item[0];
+        cargoToAdd -= floor(STACKSIZE / item[4]) - newCargo[i][1];
+        newCargo[i][1] = floor(STACKSIZE / item[4]);
+      } else if (cargoToAdd > 0) {
+        newCargo[i][0] = item[0];
+        newCargo[i][1] += cargoToAdd;
+        cargoToAdd = 0;
+      }
+    }
+  }
+
+  return [newCargo, true, addedCargo];
+}
+
+
+// add cargo directly to a slot
+function addCargoToSlot(commodityName, count, CARGO, STACKSIZE) {
   
   CARGO = CARGO??cargo // sets the input cargo array to the ship's if none is given
   STACKSIZE = STACKSIZE??maxStack // same thing here
@@ -1453,6 +1602,13 @@ function displayCargo(Cargo, STACKSIZE) {
     }
   }
   return cargoDisplay;
+}
+
+// transfers cargo from one inventory to another
+function moveCargo(slot, count, cargo1, cargo2){
+
+  
+
 }
 
 // gets the total price of a trade by getting the price for each single item to get the most precise price
