@@ -120,6 +120,8 @@ let moduleTypes = [
     defaultTime: 5,
     timerindex: 0,
     selectedStack: 0,
+    spinnerRotation: 0,
+    spinnerSpeed: 0,
     onInstall: function() {
       newTimer("refinery timer " + TIMERINDEX)
       this.timerindex = TIMERINDEX
@@ -151,7 +153,7 @@ let moduleTypes = [
 
       // if there is a recipe to complete, begin progressing it
       if(this.processing != null){
-        let recipe = recipes.refining[processing]
+        let recipe = recipes.refining[this.processing]
         this.progress += deltaTime * recipe.speed
 
         // check if the recipe has completed, and if so, attempt to complete the recipe
@@ -169,6 +171,27 @@ let moduleTypes = [
           }}
 
       }
+
+      // spin the spinner when processing
+      
+
+      if(this.processing){
+        if(this.spinnerSpeed < 420){
+          this.spinnerSpeed += 120 * (deltaTime/1000)
+        } else{
+          this.spinnerSpeed = 360
+        }
+      } else {
+        if(this.spinnerSpeed > 0){
+          this.spinnerSpeed -= 120 * (deltaTime/1000)
+        } else{
+          this.spinnerSpeed = 0
+        }
+      }
+
+      this.spinnerRotation += this.spinnerSpeed * deltaTime/1000
+
+      
 
     },
     screen: function(){
@@ -235,7 +258,8 @@ let moduleTypes = [
           themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
           function(){
   
-              
+              //BUG
+              moveCargo(escargo, cargo[escargo][1], cargo, this.inputStack)
   
               clearButtons()
               buttonsLoaded = false
@@ -261,6 +285,7 @@ let moduleTypes = [
         buttonsLoaded = true
       }
 
+      // scrollbar
       for(let i = 0; i < cargoButtons; i++){
         drawButton("Cargo Button "+i)
         rect(xo + 45, yo + 110 + (i*buttonDistance), 225 * dispCargo[i + Cscroll][0],5)
@@ -295,6 +320,24 @@ let moduleTypes = [
         rect(xo + 275, yo + 120, 25, (buttonDistance * (cargoButtons - 2)) - 5)
 
       }
+
+
+      // refiner
+      noFill()
+      stroke(themePrimary)
+      rect(xo + 450, yo + 70, 200, 50 )
+      rect(xo + 450, yo + 370, 200, 50 )
+
+      stroke(themeTertiary)
+      rect(xo + 350, yo + 140, 300, 200 )
+
+      
+
+      strokeWeight(5)
+      arc(xo + 400, yo + 240, 50, 50, 180/8 + this.spinnerRotation, (180/8) * 3 + this.spinnerRotation)
+      arc(xo + 400, yo + 240, 50, 50, 180/8 + 180/2 + this.spinnerRotation, (180/8) * 3 + 180/2 + this.spinnerRotation)
+      arc(xo + 400, yo + 240, 50, 50, 180/8 + 180 + this.spinnerRotation, (180/8) * 3 + 180 + this.spinnerRotation)
+      arc(xo + 400, yo + 240, 50, 50, 180/8 + (180/2)*3 + this.spinnerRotation, (180/8) * 3 + (180/2)*3 + this.spinnerRotation)
 
     }
   },
@@ -1607,7 +1650,39 @@ function displayCargo(Cargo, STACKSIZE) {
 // transfers cargo from one inventory to another
 function moveCargo(slot, count, cargo1, cargo2){
 
+  let carg = cargo1[slot]
+
+  // error checking
+  if(carg == undefined){
+    print("moveCargo: cargo slot 1 is undefined")
+    return
+  }
+  if(count < 0){
+    print("moveCargo: attempted to move a negative amount of cargo")
+    return
+  }
+  if(count == 0){
+    return
+  }
+
+  // check for room
+  count = min(count, carg[1])
+
+  let carg2result = addCargo(carg[0],count,cargo2)
+
+  count = min(count, carg2result[2])
+
+  // move cargo
+
+  carg[1] -= count
   
+  cargo2 = addCargo(carg[0],count,cargo2)[0]
+  print(cargo2)
+  
+  if(carg[1] <= 0){
+    carg = ["EMPTY"]
+  }
+
 
 }
 
