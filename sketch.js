@@ -131,6 +131,7 @@ let moduleTypes = [
       removeTimer("refinery timer " + this.timerindex)
     },
     update: function(){
+      
       // check if the refinery is processing anything, and if it isn't, check if it can start processing something
       if(this.processing == null){
 
@@ -160,7 +161,7 @@ let moduleTypes = [
         if(this.progress >= this.defaultTime)
         {  
           // attempt to complete the recipe, and record whether it succeded
-          let success = refine(this.processing, this.inputStack, this.outputStack)
+          //let success = refine(this.processing, this.inputStack, this.outputStack)
 
           // reset progress and recipe if successful, else, wait
           if(success){
@@ -195,6 +196,7 @@ let moduleTypes = [
 
     },
     screen: function(){
+
       let SW = 700
       let SH = 500
       
@@ -254,12 +256,18 @@ let moduleTypes = [
         )
         setButtonEnabled("Down Button", true)
 
+        print(this.inputStack)
+
         newButton("Add Stack","Add Stack",20, xo + 20 - 0.5, yo + 330, 120, 25,
           themeSecondary,color(10,10,15),themeSecondary,color(10,10,15),2,
-          function(){
+          ()=>{
   
               //BUG
+
+              print(this.inputStack)
               moveCargo(escargo, cargo[escargo][1], cargo, this.inputStack)
+
+              print("returned inputStack", this.inputStack)
   
               clearButtons()
               buttonsLoaded = false
@@ -1650,6 +1658,7 @@ function displayCargo(Cargo, STACKSIZE) {
 // transfers cargo from one inventory to another
 function moveCargo(slot, count, cargo1, cargo2){
 
+  print(cargo1)
   let carg = cargo1[slot]
 
   // error checking
@@ -1664,9 +1673,10 @@ function moveCargo(slot, count, cargo1, cargo2){
   if(count == 0){
     return
   }
+  if(carg == ["EMPTY"]) return
+
 
   // check for room
-  count = min(count, carg[1])
 
   let carg2result = addCargo(carg[0],count,cargo2)
 
@@ -1677,11 +1687,12 @@ function moveCargo(slot, count, cargo1, cargo2){
   carg[1] -= count
   
   cargo2 = addCargo(carg[0],count,cargo2)[0]
-  print(cargo2)
+  print("new output cargo", cargo2)
   
   if(carg[1] <= 0){
     carg = ["EMPTY"]
   }
+  cargo1[slot] = carg
 
 
 }
