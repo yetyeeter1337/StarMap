@@ -265,7 +265,8 @@ let moduleTypes = [
               //BUG
 
               print(this.inputStack)
-              moveCargo(escargo, cargo[escargo][1], cargo, this.inputStack)
+              let result = moveCargo(escargo, cargo[escargo][1], cargo, this.inputStack)
+              this.inputStack = result[1] // currently causes a crash
 
               print("returned inputStack", this.inputStack)
   
@@ -1693,6 +1694,8 @@ function moveCargo(slot, count, cargo1, cargo2){
     carg = ["EMPTY"]
   }
   cargo1[slot] = carg
+
+  return [cargo1, cargo2]
 
 
 }
